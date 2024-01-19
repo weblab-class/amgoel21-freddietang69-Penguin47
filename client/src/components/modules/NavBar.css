@@ -1,0 +1,12 @@
+nav {
+  background-color: aqua;
+  height: 30px;
+  margin: 0px 20%;
+  padding: var(--s);
+}
+
+.NavBar-link {
+  padding: var(--s);
+  color: gray;
+  text-decoration: none;
+}
