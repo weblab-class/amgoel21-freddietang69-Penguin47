@@ -8,8 +8,8 @@ const GOOGLE_CLIENT_ID = "707563753460-4ihlvt7ht9nsnrfsvj1j5r676kiommac.apps.goo
 
 const NavBar = ({ userId, handleLogin, handleLogout }) => {
   return (
-    <nav>
-      <div className="u-inlineBlock">
+    <nav className="bg-teal-300 h-8 flex">
+      <div className="inline-block w-4/6">
         <Link to="/" className="NavBar-link">
           Home
         </Link>
@@ -23,7 +23,7 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
           Stats
         </Link>
       </div>
-      <div className="u-inlineBlock">
+      <div className="inline-block">
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
           {userId ? (
             <button

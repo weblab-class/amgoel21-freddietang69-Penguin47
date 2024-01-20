@@ -45,7 +45,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div className="ml-96 mr-96">
       <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
       <Routes>
         <Route path="/" element={<Skeleton />} />
