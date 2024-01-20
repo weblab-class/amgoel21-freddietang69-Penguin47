@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import Lobby from "./Lobby.js";
 import { get, post } from "../../utilities.js";
 
+import { socket } from "../../client-socket.js";
+
 /**
  * LobbyList renders the list of lobbies in the hub
  *
@@ -15,8 +17,21 @@ const LobbyList = (props) => {
   useEffect(() => {
     get("/api/lobbies", {}).then((data) => {
       setLobbies(data);
-      console.log(data);
+      //console.log(data);
     });
+  }, []);
+
+  useEffect(() => {
+    const callback = (data) => {
+      get("/api/lobbies", {}).then((data) => {
+        setLobbies(data);
+        console.log(data);
+      });
+    };
+    socket.on("lobby", callback);
+    return () => {
+      socket.off("lobby", callback);
+    };
   }, []);
 
   const getLobbyList = () => {
@@ -26,8 +41,8 @@ const LobbyList = (props) => {
   };
 
   const makeLobby = () => {
-    console.log(props);
-    post("/api/makelobby", { userId: props.userId, name: "c" });
+    //console.log(props);
+    post("/api/makelobby", { userId: props.userId, name: "d" });
   };
 
   return (
@@ -45,7 +60,7 @@ const LobbyList = (props) => {
       {/* <Lobby lobby={{ name: "test 1" }} />
       <Lobby lobby={{ name: "test 2" }} /> */}
       {lobbies.map((lobby) => {
-        return <Lobby lobby={lobby} key={lobby._id}></Lobby>;
+        return <Lobby userId={props.userId} lobby={lobby} key={lobby._id}></Lobby>;
       })}
     </div>
   );

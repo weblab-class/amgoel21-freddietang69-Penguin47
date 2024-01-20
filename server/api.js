@@ -57,6 +57,26 @@ router.post("/makelobby", (req, res) => {
   lobby.save().then((data) => {
     console.log(data);
   });
+  socketManager.getIo().emit("lobby", lobby);
+});
+
+router.post("/addlobbyplayer", (req, res) => {
+  //console.log(req.body.lobby);
+  //console.log(req.body.userId);
+  async function foo() {
+    await Lobby.updateOne(
+      { _id: req.body.lobby._id },
+      {
+        $set: { players: req.body.lobby.players.concat([req.body.userId]) },
+      }
+    );
+  }
+  foo();
+  socketManager.getIo().emit("lobby", "hi");
+});
+
+router.get("/getname", (req, res) => {
+  User.find({ _id: req.query._id }).then((data) => res.send(data.name));
 });
 
 // anything else falls to this "not found" case

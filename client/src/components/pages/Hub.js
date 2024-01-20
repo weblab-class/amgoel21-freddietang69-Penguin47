@@ -9,6 +9,7 @@ import LobbyList from "../modules/LobbyList.js";
  * @param {string} userId
  */
 const Hub = (props) => {
+  //console.log("hub", props.userId);
   return (
     <>
       <LobbyList userId={props.userId} />
