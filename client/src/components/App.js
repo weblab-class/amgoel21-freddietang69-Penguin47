@@ -5,7 +5,8 @@ import jwt_decode from "jwt-decode";
 
 import NavBar from "./modules/NavBar.js";
 import NotFound from "./pages/NotFound.js";
-import Skeleton from "./pages/Skeleton.js";
+import Home from "./pages/Home.js";
+import Hub from "./pages/Hub.js";
 import Rules from "./pages/Rules.js";
 
 import "../utilities.css";
@@ -44,12 +45,15 @@ const App = () => {
     post("/api/logout");
   };
 
+  document.body.style = "background: rgb(5, 6, 23);";
+
   return (
     <div className="ml-96 mr-96">
       <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
       <Routes>
-        <Route path="/" element={<Skeleton />} />
+        <Route path="/" element={<Home />} />
         <Route path="/rules" element={<Rules />} />
+        <Route path="/hub" element={<Hub />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
