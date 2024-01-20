@@ -111,7 +111,7 @@ const Rules = () => {
           by playing any card they want.
         </li>
         <li>
-          Playing 4 of the same card (or 8 if with 2 decks) also acts like a bomb if they are
+          Playing four of the same card (or eight if with 2 decks) also acts like a bomb if they are
           legally played. For example, someone could play four 5s on top of a 2 and that current
           pile would be discarded, but they could not play the four 5s on top of a 6.
         </li>
