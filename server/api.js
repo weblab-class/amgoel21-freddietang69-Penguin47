@@ -44,6 +44,10 @@ router.post("/initsocket", (req, res) => {
 // | write your API methods below!|
 // |------------------------------|
 
+router.get("/lobbies", (req, res) => {
+  Lobby.find({}).then((data) => res.send(data));
+});
+
 router.post("/makelobby", (req, res) => {
   const lobby = new Lobby({
     name: req.body.name,

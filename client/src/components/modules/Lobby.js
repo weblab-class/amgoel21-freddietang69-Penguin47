@@ -5,10 +5,11 @@ import React from "react";
  * It renders the lobby information: name, players, etc
  *
  * Proptypes
- * @param {string} _id of the lobby
+ * @param {lobby object} lobby of the lobby
  */
 const Lobby = (props) => {
-  return <div className="bg-yellow-500">Lobby {props._id}</div>;
+  console.log(props.lobby);
+  return <div className="bg-yellow-500">Lobby {props.lobby.name}</div>;
 };
 
 export default Lobby;
