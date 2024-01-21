@@ -23,9 +23,9 @@ const LobbyList = (props) => {
 
   useEffect(() => {
     const callback = (data) => {
-      get("/api/lobbies", {}).then((data) => {
-        setLobbies(data);
-        console.log(data);
+      get("/api/lobbies", {}).then((lobbyData) => {
+        setLobbies(lobbyData);
+        console.log(lobbyData);
       });
     };
     socket.on("lobby", callback);
@@ -42,7 +42,10 @@ const LobbyList = (props) => {
 
   const makeLobby = () => {
     //console.log(props);
-    post("/api/makelobby", { userId: props.userId, name: "d" });
+    get("/api/user", { _id: props.userId }).then((data) => {
+      post("/api/makelobby", { user: data, name: "a" });
+    });
+    // post("/api/makelobby", { userId: props.userId, name: "d" });
   };
 
   return (
@@ -53,9 +56,13 @@ const LobbyList = (props) => {
         </button>
       </div>
       <div className="bg-red-500">
-        <button className="text-white" onClick={makeLobby}>
-          Make a Lobby
-        </button>
+        {props.userId ? (
+          <button className="text-white" onClick={makeLobby}>
+            Make a Lobby
+          </button>
+        ) : (
+          "You cannot make a lobby"
+        )}
       </div>
       {/* <Lobby lobby={{ name: "test 1" }} />
       <Lobby lobby={{ name: "test 2" }} /> */}

@@ -51,8 +51,13 @@ router.get("/lobbies", (req, res) => {
 router.post("/makelobby", (req, res) => {
   const lobby = new Lobby({
     name: req.body.name,
-    creator: req.body.userId,
-    players: [req.body.userId],
+    creator: req.body.user._id,
+    players: [
+      {
+        _id: req.body.user._id,
+        name: req.body.user.name,
+      },
+    ],
   });
   lobby.save().then((data) => {
     console.log(data);
@@ -67,7 +72,14 @@ router.post("/addlobbyplayer", (req, res) => {
     await Lobby.updateOne(
       { _id: req.body.lobby._id },
       {
-        $set: { players: req.body.lobby.players.concat([req.body.userId]) },
+        $set: {
+          players: req.body.lobby.players.concat([
+            {
+              _id: req.body.user._id,
+              name: req.body.user.name,
+            },
+          ]),
+        },
       }
     );
   }
@@ -75,8 +87,12 @@ router.post("/addlobbyplayer", (req, res) => {
   socketManager.getIo().emit("lobby", "hi");
 });
 
-router.get("/getname", (req, res) => {
-  User.find({ _id: req.query._id }).then((data) => res.send(data.name));
+router.get("/user", (req, res) => {
+  //console.log("getting user id", req.query._id);
+  User.findOne({ _id: req.query._id }).then((data) => {
+    //console.log(data);
+    res.send(data);
+  });
 });
 
 // anything else falls to this "not found" case
