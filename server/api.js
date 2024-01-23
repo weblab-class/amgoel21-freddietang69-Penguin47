@@ -123,6 +123,7 @@ sendState = (game) => {
     to_send.ready = player.ready;
     to_send.player_pos = i;
     i++;
+    // console.log(player._id, to_send);
     socketManager.getSocketFromUserID(player._id).emit("update", to_send);
   }
 };
@@ -304,14 +305,34 @@ router.post("/selectTop", (req, res) => {
     });
   }
 });
+redraw = (game) => {
+  if (game.deck.length > 0 && game.players[0].deck.length < 3) {
+    game.players[0].deck.push(game.deck.pop());
+  } else if (game.players[0].deck.length === 0) {
+    if (game.players[0].tops.size > 0) {
+      game.players[0].deck = game.players[0].tops;
+      game.players[0].tops = [];
+    } else if (game.players[0].bottoms.size > 0) {
+      game.players[0].deck.push(game.players[0].bottoms.pop());
+    } else {
+      //TODO declare winner
+    }
+  }
+};
+router.get("/hi", (req, res) => {
+  console.log("hi");
+});
 router.post("/selectPlay", (req, res) => {
+  console.log("WHAT", req.body);
   Game.findOne({ _id: req.body.game_id }).then((game) => {
     //must be in selecting mode
     //TODO implement bombing out of turn
+    console.log("try to play");
     if (game.gameState !== "playing" || game.players[0]._id !== req.user._id) {
       res.send(false);
       return;
     }
+    console.log("playing");
     //TODO implement bombing on turn
     //TODO implement 2,10,7
     const player = game.players[0];
@@ -323,13 +344,44 @@ router.post("/selectPlay", (req, res) => {
         game.pile[game.pile.length - 1].value === 9)
     ) {
       //delete card in hand and put it on top of pile
-      game.pile.push(game.players[0].deck.splice(req.body.idx, 1)[0]);
+      const card = game.players[0].deck.splice(req.body.idx, 1)[0];
+      game.pile.push({ value: card.value, suit: card.suit });
+      //draw
+      console.log("redraw time");
+      redraw(game);
+      //TODO implement playing multiple cards logic
       //rotate players
       game.players.push(game.players.shift());
       sendState(game);
+      console.log(game.pile);
       game.save();
     }
   });
+  res.send({ 1: "selectPlayDone" });
+});
+router.post("/take", (req, res) => {
+  console.log("????");
+  Game.findOne({ _id: req.body.game_id }).then((game) => {
+    //must be in selecting mode
+    //TODO implement bombing out of turn
+    // console.log("try to take");
+    if (
+      game.gameState !== "playing" ||
+      game.players[0]._id !== req.user._id ||
+      game.pile.length === 0
+    ) {
+      res.send(false);
+      return;
+    }
+    game.players[0].deck.push(...game.pile);
+    game.pile = [];
+    //rotate players
+    game.players.push(game.players.shift());
+    sendState(game);
+    // console.log(game.pile);
+    game.save();
+  });
+  res.send({ 1: "bye" });
 });
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

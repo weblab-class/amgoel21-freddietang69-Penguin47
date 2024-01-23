@@ -78,15 +78,25 @@ const Game = (props) => {
     loginModal = <div className="text-white"> Please Login First! </div>;
   }
   const select = () => {
+    console.log("attempted select");
     if (selected !== undefined) {
       if (gameState === "selecting") {
         post("/api/selectTop", { idx: selected, game_id: gameID });
         setSelected(undefined);
       } else if (gameState === "playing") {
-        post("/api/selectPlay", { idx: selected, game_id: gameID });
+        console.log("playing select");
+        post("/api/selectPlay", { idx: selected, game_id: gameID }).then((stuff) => {
+          console.log(stuff);
+        });
+        get("/api/hi", {});
         setSelected(undefined);
       }
     }
+  };
+  const take = () => {
+    post("/api/take", { game_id: gameID }).then((stuff) => {
+      console.log(stuff);
+    });
   };
   return (
     <>
@@ -100,8 +110,21 @@ const Game = (props) => {
         })}
       </div>
       <div className="text-white">
+        {gameState === "playing" && <button onClick={take}>Take</button>}
+      </div>
+      <div className="text-white">
         {playerDeck.map((card, index) => {
-          return (
+          return selected === index ? (
+            <button
+              className="text-white font-bold underline"
+              onClick={() => {
+                setSelected(index);
+              }}
+              key={index}
+            >
+              {JSON.stringify(card)}
+            </button>
+          ) : (
             <button
               className="text-white"
               onClick={() => {
@@ -114,7 +137,17 @@ const Game = (props) => {
           );
         })}
       </div>
-      <div className="text_white"></div>
+      <div className="text-white">
+        <h3>Pile</h3>
+        {pile.map((card, index) => {
+          return (
+            <div key={index} className="text-white">
+              {JSON.stringify(card)}
+            </div>
+          );
+        })}
+      </div>
+      <div className="text-white"></div>
     </>
   );
 };
