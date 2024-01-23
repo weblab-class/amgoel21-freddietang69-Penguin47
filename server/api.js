@@ -62,21 +62,6 @@ router.post("/makelobby", (req, res) => {
       },
     ],
   });
-  // const game = new Game({
-  //   name: req.body.name,
-  //   creator: req.body.user._id,
-  //   players: [
-  //     {
-  //       _id: req.body.user._id,
-  //       name: req.body.user.name,
-  //       deck: [],
-  //       tops: [],
-  //       bottoms: [],
-  //     },
-  //   ],
-  //   gameState: "waiting",
-  //   deck: [],
-  // });
   Lobby.find({ name: req.body.name }).then((data) => {
     console.log("hello");
     console.log(data);
@@ -108,6 +93,7 @@ router.post("/makegame", (req, res) => {
         deck: [],
         tops: [],
         bottoms: [],
+        pile: [],
       },
     ],
     gameState: "waiting",
@@ -129,6 +115,7 @@ sendState = (game) => {
     }),
     gameState: game.gameState,
     deck: game.deck.length,
+    pile: game.pile,
   };
   let i = 0;
   for (const player of game.players) {
@@ -139,7 +126,10 @@ sendState = (game) => {
     socketManager.getSocketFromUserID(player._id).emit("update", to_send);
   }
 };
-startGame = (game) => {};
+startGame = (game) => {
+  game.gameState = "playing";
+  sendState(game);
+};
 startSelect = (game) => {
   const deck = [];
   for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
@@ -165,6 +155,13 @@ startSelect = (game) => {
     for (let value of [2, 7, 10, 14]) {
       deck.push({ suit: suit, value: value });
     }
+  }
+  for (let i = deck.length - 1; i >= 0; i--) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * (i + 1));
+
+    // And swap it with the current element.
+    [deck[i], deck[randomIndex]] = [deck[randomIndex], deck[i]];
   }
   for (let i = 0; i < game.players.length; i++) {
     game.players[i].ready = false;
@@ -193,6 +190,7 @@ router.post("/ready", (req, res) => {
             res.send(true);
             return;
           }
+          //only reading in the selecting stage once player has selected all top cards
           if (game.gameState == "selecting") {
             if (player.tops.length < 3) {
               res.send(false);
@@ -224,22 +222,6 @@ router.post("/ready", (req, res) => {
   }
 });
 router.post("/addgameplayer", (req, res) => {
-  //  Game.findOne({ name: req.body.name }).then((game) => {
-  //   game.players=game.players.concat([
-  //           {
-  //             _id: req.body.user._id,
-  //             name: req.body.user.name,
-  //             deck: [],
-  //             tops: [],
-  //             bottoms: [],
-  //           },
-  //         ]),
-  //       };
-  //     }
-  //   );
-
-  //   res.send(game._id);
-  // });
   Game.findOne({ name: req.body.name }).then(async (game) => {
     console.log("asdf");
     console.log(game._id);
@@ -297,18 +279,23 @@ router.get("/user", (req, res) => {
 router.post("/selectTop", (req, res) => {
   if (req.user) {
     Game.findOne({ _id: req.body.game_id }).then((game) => {
+      //must be in selecting mode
+      if (game.gameState !== "selecting") {
+        res.send(false);
+        return;
+      }
       for (let i = 0; i < game.players.length; i++) {
         const player = game.players[i];
 
         if (player._id === req.user._id) {
           console.log(req.user._id);
+          //pop selected card and put it in tops
           if (player.tops.length < 3) {
             player.tops.push(player.deck[req.body.idx]);
             player.deck.splice(req.body.idx, 1);
             game.players[i] = player;
             console.log(game.players);
             sendState(game);
-
             game.save();
           }
           break;
@@ -316,6 +303,33 @@ router.post("/selectTop", (req, res) => {
       }
     });
   }
+});
+router.post("/selectPlay", (req, res) => {
+  Game.findOne({ _id: req.body.game_id }).then((game) => {
+    //must be in selecting mode
+    //TODO implement bombing out of turn
+    if (game.gameState !== "playing" || game.players[0]._id !== req.user._id) {
+      res.send(false);
+      return;
+    }
+    //TODO implement bombing on turn
+    //TODO implement 2,10,7
+    const player = game.players[0];
+    if (
+      game.pile.length === 0 ||
+      (player.deck[req.body.idx].value >= game.pile[game.pile.length - 1].value &&
+        game.pile[game.pile.length - 1].value !== 9) ||
+      (player.deck[req.body.idx].value < game.pile[game.pile.length - 1].value &&
+        game.pile[game.pile.length - 1].value === 9)
+    ) {
+      //delete card in hand and put it on top of pile
+      game.pile.push(game.players[0].deck.splice(req.body.idx, 1)[0]);
+      //rotate players
+      game.players.push(game.players.shift());
+      sendState(game);
+      game.save();
+    }
+  });
 });
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {

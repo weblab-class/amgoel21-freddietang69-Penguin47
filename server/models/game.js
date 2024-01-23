@@ -35,6 +35,12 @@ const GameScheme = new mongoose.Schema({
       value: Number,
     },
   ],
+  pile: [
+    {
+      suit: String,
+      value: Number,
+    },
+  ],
 });
 
 module.exports = mongoose.model("game", GameScheme);
