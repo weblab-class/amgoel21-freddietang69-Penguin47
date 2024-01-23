@@ -116,23 +116,65 @@ router.post("/makegame", (req, res) => {
   game.save();
   res.send(game._id);
 });
-startGame = (game) => {
+sendState = (game) => {
+  to_send = {
+    players: game.players.map((player) => {
+      return {
+        name: player.name,
+        _id: player._id,
+        deck: player.deck.length,
+        tops: player.tops,
+        bottoms: player.bottoms.length,
+      };
+    }),
+    gameState: game.gameState,
+    deck: game.deck.length,
+  };
+  let i = 0;
+  for (const player of game.players) {
+    to_send.player_deck = player.deck;
+    to_send.ready = player.ready;
+    to_send.player_pos = i;
+    i++;
+    socketManager.getSocketFromUserID(player._id).emit("update", to_send);
+  }
+};
+startGame = (game) => {};
+startSelect = (game) => {
   const deck = [];
   for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
-    for (let value = 2; value <= 14; value++) {
-      deck.push({ suit: suit, value: value });
+    for (let value = 3; value <= 13; value++) {
+      if (value !== 7 && value !== 10) {
+        deck.push({ suit: suit, value: value });
+      }
     }
   }
-  for (let i = 51; i >= 0; i--) {
+  for (let i = deck.length - 1; i >= 0; i--) {
     // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * (i + 1));
 
     // And swap it with the current element.
     [deck[i], deck[randomIndex]] = [deck[randomIndex], deck[i]];
   }
+  for (let i = 0; i < game.players.length; i++) {
+    for (let j = 0; j < 3; j++) {
+      game.players[i].bottoms.push(deck.pop());
+    }
+  }
+  for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
+    for (let value of [2, 7, 10, 14]) {
+      deck.push({ suit: suit, value: value });
+    }
+  }
+  for (let i = 0; i < game.players.length; i++) {
+    game.players[i].ready = false;
+    for (let j = 0; j < 6; j++) {
+      game.players[i].deck.push(deck.pop());
+    }
+  }
   game.deck = deck;
-  game.gameState = "playing";
-  // game.save();
+  game.gameState = "selecting";
+  sendState(game);
 };
 router.post("/ready", (req, res) => {
   if (req.user) {
@@ -151,6 +193,12 @@ router.post("/ready", (req, res) => {
             res.send(true);
             return;
           }
+          if (game.gameState == "selecting") {
+            if (player.tops.length < 3) {
+              res.send(false);
+              return;
+            }
+          }
           player.ready = true;
           game.players[i] = player;
           console.log(game.players);
@@ -158,12 +206,17 @@ router.post("/ready", (req, res) => {
           break;
         }
       }
+
       if (
         found &&
         game.players.length > 1 &&
         game.players.filter((player) => !player.ready).length == 0
       ) {
-        startGame(game);
+        if (game.gameState === "selecting") {
+          startGame(game);
+        } else if (game.gameState == "waiting") {
+          startSelect(game);
+        }
       }
       game.save();
       res.send(found);
@@ -241,7 +294,29 @@ router.get("/user", (req, res) => {
     res.send(data);
   });
 });
+router.post("/selectTop", (req, res) => {
+  if (req.user) {
+    Game.findOne({ _id: req.body.game_id }).then((game) => {
+      for (let i = 0; i < game.players.length; i++) {
+        const player = game.players[i];
 
+        if (player._id === req.user._id) {
+          console.log(req.user._id);
+          if (player.tops.length < 3) {
+            player.tops.push(player.deck[req.body.idx]);
+            player.deck.splice(req.body.idx, 1);
+            game.players[i] = player;
+            console.log(game.players);
+            sendState(game);
+
+            game.save();
+          }
+          break;
+        }
+      }
+    });
+  }
+});
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
   console.log(`API route not found: ${req.method} ${req.url}`);
