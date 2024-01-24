@@ -24,6 +24,9 @@ const removeUser = (user, socket) => {
   if (user) delete userToSocketMap[user._id];
   delete socketToUserMap[socket.id];
 };
+// setInterval(() => {
+//   console.log(userToSocket);
+// }, 1000 / 60); // 60 frames per second
 
 module.exports = {
   init: (http) => {
@@ -33,6 +36,7 @@ module.exports = {
       console.log(`socket has connected ${socket.id}`);
       socket.on("disconnect", (reason) => {
         const user = getUserFromSocketID(socket.id);
+        console.log("disconnect");
         removeUser(user, socket);
       });
     });

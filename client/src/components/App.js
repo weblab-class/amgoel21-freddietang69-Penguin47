@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.js";
 import Home from "./pages/Home.js";
 import Hub from "./pages/Hub.js";
 import Rules from "./pages/Rules.js";
+import Game from "./pages/Game.js";
 
 import "../utilities.css";
 
@@ -54,6 +55,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/rules" element={<Rules />} />
         <Route path="/hub" element={<Hub userId={userId} />} />
+        <Route path="/game" element={<Game userId={userId} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

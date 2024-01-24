@@ -25,6 +25,9 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
         <Link to="/hub" className="NavBar-link">
           Go to games
         </Link>
+        <Link to="/game" className="NavBar-link">
+          game
+        </Link>
       </div>
       <div className="inline-block">
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
