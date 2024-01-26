@@ -19,24 +19,12 @@ const Game = (props) => {
     // 0 = not started
     const [gameState, setgameState] = useState("waiting");
 
-    // add event listener on mount
     useEffect(() => {
-        // console.log("what");
-        // console.log(props.userId);
         if (props.userId) {
-            // get("/api/user", { _id: props.userId }).then((data) => {
-            //     const body = { user: data, name: "1" };
-            // post("/api/makegame", body).then((data) => {
-            //   setgameID(data);
-            // });
-            post("/api/addgameplayer", { name: "1" }).then((data) => {
+            post("/api/addgameplayer", { name: "test" }).then((data) => {
                 setgameID(data);
             });
-            // });
         }
-        // } else {
-        //     // console.log("something");
-        // }
     }, [props.userId]);
 
     // update game periodically
@@ -64,42 +52,26 @@ const Game = (props) => {
 
     const readyUp = () => {
         if (gameID !== undefined) {
-            //get("/api/user", { _id: props.userId }).then((data) => {
-            post("/api/ready", { game_id: gameID }).then((data) => {
-                if (data) {
-                    setReady(true);
-                }
-            });
-            //});
+            socket.emit("ready", gameID);
         }
     };
-    // display text if the player is not logged in
-    let loginModal = null;
-    if (!props.userId) {
-        loginModal = <div className="text-white"> Please Login First! </div>;
-    }
 
     const select = () => {
         console.log("attempted select");
         if (selected !== undefined) {
             if (gameState === "selecting") {
-                post("/api/selectTop", { idx: selected, game_id: gameID });
+                socket.emit("selectTop", { idx: selected, gameId: gameID });
                 setSelected(undefined);
             } else if (gameState === "playing") {
                 console.log("playing select");
-                post("/api/selectPlay", { idx: selected, game_id: gameID }).then((stuff) => {
-                    console.log(stuff);
-                });
-                get("/api/hi", {});
+                socket.emit("selectPlay", { idx: selected, gameId: gameID });
                 setSelected(undefined);
             }
         }
     };
 
     const take = () => {
-        post("/api/take", { game_id: gameID }).then((stuff) => {
-            console.log(stuff);
-        });
+        socket.emit("take", gameID);
     };
 
     return (
@@ -152,14 +124,6 @@ const Game = (props) => {
                 })}
             </div>
             <div className="text-white"></div>
-            <button
-                className="text-white font-bold"
-                onClick={() => {
-                    post("/api/resetgame", { name: "1" });
-                }}
-            >
-                Reset game
-            </button>
         </>
     );
 };

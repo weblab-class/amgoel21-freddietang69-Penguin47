@@ -1,196 +1,232 @@
 /** constants */
-const MAP_LENGTH = 500;
-const INITIAL_RADIUS = 20;
-const MAX_PLAYER_SIZE = 200;
-const FOOD_SIZE = 2;
-const EDIBLE_RANGE_RATIO = 0.9;
-const EDIBLE_SIZE_RATIO = 0.9;
-const colors = ["red", "blue", "green", "yellow", "purple", "orange", "silver"]; // colors to use for players
 
 /** Utils! */
 
 /** Helper to generate a random integer */
 const getRandomInt = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 };
 
-/** Helper to generate a random position on the map */
-const getRandomPosition = () => {
-  return {
-    x: getRandomInt(0, MAP_LENGTH),
-    y: getRandomInt(0, MAP_LENGTH),
-  };
+idToGameMap = {};
+
+const makeGame = (name, creator = "billy bob joe") => {
+    //console.log(Object.keys(idToGameMap).length);
+    game = {
+        name: name,
+        _id: Object.keys(idToGameMap).length,
+        creator: creator,
+        players: [],
+        gameState: "waiting",
+        deck: [],
+        pile: [],
+    };
+    idToGameMap[game._id] = game;
 };
 
-let playersEaten = []; // A list of ids of any players that have just been eaten!
+makeGame("test");
 
-/** Helper to compute when player 1 tries to eat player 2 */
-const playerAttemptEatPlayer = (pid1, pid2) => {
-  const player1Position = gameState.players[pid1].position;
-  const player2Position = gameState.players[pid2].position;
-  const x1 = player1Position.x;
-  const y1 = player1Position.y;
-  const x2 = player2Position.x;
-  const y2 = player2Position.y;
-  const dist = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-  if (dist < gameState.players[pid1].radius * EDIBLE_RANGE_RATIO) {
-    // player 2 is within player 1's eat range
-    if (gameState.players[pid1].radius * EDIBLE_SIZE_RATIO > gameState.players[pid2].radius) {
-      // player 1 is big enough to eat player 2
-      gameState.players[pid1].radius += gameState.players[pid2].radius;
-      playersEaten.push(pid2);
+const addPlayerToGame = (gameId, user) => {
+    game = idToGameMap[gameId];
+    let alreadyInGame = false; // MAKE SURE WE DONT ADD SAME PLAYER MULTIPLE TIMES
+    for (player of game.players) alreadyInGame |= player._id == user._id;
+    if (!alreadyInGame) {
+        game.players.push({
+            _id: user._id,
+            name: user.name,
+            deck: [],
+            tops: [],
+            bottoms: [],
+        });
     }
-  }
 };
 
-/** Attempts all pairwise eating between players */
-const computePlayersEatPlayers = () => {
-  if (Object.keys(gameState.players).length >= 2) {
-    Object.keys(gameState.players).forEach((pid1) => {
-      Object.keys(gameState.players).forEach((pid2) => {
-        playerAttemptEatPlayer(pid1, pid2);
-      });
-    });
-  }
-  // Remove players who have been eaten
-  playersEaten.forEach((playerid) => {
-    removePlayer(playerid);
-  });
-  playersEaten = []; // Reset players that have just been eaten
-};
+const readyUp = (gameId, user) => {
+    console.log(user._id);
+    const game = idToGameMap[gameId];
 
-/** Helper to check a player eating a piece of food */
-const playerAttemptEatFood = (pid1, f) => {
-  const player1Position = gameState.players[pid1].position;
-  const foodPosition = f.position;
-  const x1 = player1Position.x;
-  const y1 = player1Position.y;
-  const x2 = foodPosition.x;
-  const y2 = foodPosition.y;
-  const dist = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-  if (dist < gameState.players[pid1].radius - FOOD_SIZE) {
-    // food is within player 1's eat range
-    if (gameState.players[pid1].radius > FOOD_SIZE) {
-      // player 1 is big enough to eat food
-      gameState.players[pid1].radius += FOOD_SIZE;
-      removeFood(f);
+    let found = false;
+    for (let i = 0; i < game.players.length; i++) {
+        const player = game.players[i];
+        //console.log(player);
+        //console.log(user._id);
+        if (player._id === user._id) {
+            console.log("found " + user._id);
+            found = true;
+            if (player.ready) return true;
+            //only reading in the selecting stage once player has selected all top cards
+            if (game.gameState == "selecting") {
+                if (player.tops.length < 3) {
+                    return false;
+                }
+            }
+            player.ready = true;
+            game.players[i] = player;
+            // console.log(game.players);
+            break;
+        }
     }
-  }
-};
 
-/** Attempts all pairwise eating between each player and all foods */
-const computePlayersEatFoods = () => {
-  Object.keys(gameState.players).forEach((pid1) => {
-    gameState.food.forEach((f) => {
-      playerAttemptEatFood(pid1, f);
-    });
-  });
-};
-
-/** Game state */
-const gameState = {
-  winner: null,
-  players: {},
-  food: [],
-};
-
-/** Game logic */
-
-/** Adds a player to the game state, initialized with a random location */
-const spawnPlayer = (id) => {
-  gameState.players[id] = {
-    position: getRandomPosition(),
-    radius: INITIAL_RADIUS,
-    color: colors[Math.floor(Math.random() * colors.length)],
-  };
-};
-
-/** Adds a food to the game state, initialized with a random location */
-const spawnFood = () => {
-  gameState.food.push({
-    position: getRandomPosition(),
-    radius: FOOD_SIZE,
-    color: colors[Math.floor(Math.random() * colors.length)],
-  });
-};
-
-/** Moves a player based off the sent data from the "move" socket msg */
-const movePlayer = (id, dir) => {
-  // If player doesn't exist, don't move anything
-  if (gameState.players[id] == undefined) {
-    return;
-  }
-
-  // Move player (unbounded)
-  if (dir === "up") {
-    gameState.players[id].position.y += 10;
-  } else if (dir === "down") {
-    gameState.players[id].position.y -= 10;
-  } else if (dir === "left") {
-    gameState.players[id].position.x -= 10;
-  } else if (dir === "right") {
-    gameState.players[id].position.x += 10;
-  }
-};
-
-/** Spawn a food if there are less than 10 foods */
-const checkEnoughFoods = () => {
-  if (gameState.food.length < 10) {
-    spawnFood();
-  }
-};
-
-/** Check win condition */
-const checkWin = () => {
-  const winners = Object.keys(gameState.players).filter((key) => {
-    // check if player is sufficiently large
-    const player = gameState.players[key];
-    if (player.radius > MAX_PLAYER_SIZE) {
-      return true;
+    if (
+        found &&
+        game.players.length > 1 &&
+        game.players.filter((player) => !player.ready).length == 0
+    ) {
+        if (game.gameState === "selecting") {
+            startGame(game);
+        } else if (game.gameState == "waiting") {
+            startSelect(game);
+        }
     }
-  });
-
-  // WARNING: race condition here; if players' radii become >200 at the same time, game will keep going
-  if (winners.length === 1) {
-    gameState.winner = winners[0];
-    Object.keys(gameState.players).forEach((key) => {
-      // remove all players from the game (effectively resetting the game)
-      removePlayer(key);
-    });
-  }
 };
 
-/** Update the game state. This function is called once per server tick. */
-const updateGameState = () => {
-  // TODO (Step 6.5): add checkWin to game loop
-  // Uncomment the following code:
-  checkWin();
-  computePlayersEatPlayers();
-  computePlayersEatFoods();
-  checkEnoughFoods();
+const startGame = (game) => {
+    game.gameState = "playing";
 };
 
-/** Remove a player from the game state if they disconnect or if they get eaten */
-const removePlayer = (id) => {
-  if (gameState.players[id] != undefined) {
-    delete gameState.players[id];
-  }
+const startSelect = (game) => {
+    const deck = [];
+    for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
+        for (let value = 3; value <= 13; value++) {
+            if (value !== 7 && value !== 10) {
+                deck.push({ suit: suit, value: value });
+            }
+        }
+    }
+    for (let i = deck.length - 1; i >= 0; i--) {
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * (i + 1));
+
+        // And swap it with the current element.
+        [deck[i], deck[randomIndex]] = [deck[randomIndex], deck[i]];
+    }
+    for (let i = 0; i < game.players.length; i++) {
+        for (let j = 0; j < 3; j++) {
+            game.players[i].bottoms.push(deck.pop());
+        }
+    }
+    for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
+        for (let value of [2, 7, 10, 14]) {
+            deck.push({ suit: suit, value: value });
+        }
+    }
+    for (let i = deck.length - 1; i >= 0; i--) {
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * (i + 1));
+
+        // And swap it with the current element.
+        [deck[i], deck[randomIndex]] = [deck[randomIndex], deck[i]];
+    }
+    for (let i = 0; i < game.players.length; i++) {
+        game.players[i].ready = false;
+        for (let j = 0; j < 6; j++) {
+            game.players[i].deck.push(deck.pop());
+        }
+    }
+    game.deck = deck;
+    game.gameState = "selecting";
 };
 
-/** Remove a food from the game state if it gets eaten, given reference to food object */
-const removeFood = (f) => {
-  let ix = gameState.food.indexOf(f);
-  if (ix !== -1) {
-    gameState.food.splice(ix, 1);
-  }
+const redraw = (game) => {
+    if (game.deck.length > 0 && game.players[0].deck.length < 3) {
+        game.players[0].deck.push(game.deck.pop());
+    } else if (game.players[0].deck.length === 0) {
+        if (game.players[0].tops.size > 0) {
+            game.players[0].deck = game.players[0].tops;
+            game.players[0].tops = [];
+        } else if (game.players[0].bottoms.size > 0) {
+            game.players[0].deck.push(game.players[0].bottoms.pop());
+        } else {
+            //TODO declare winner
+        }
+    }
+};
+
+const selectTop = (gameId, user, idx) => {
+    game = idToGameMap[gameId];
+    if (game.gameState !== "selecting") {
+        return false;
+    }
+    for (let i = 0; i < game.players.length; i++) {
+        const player = game.players[i];
+
+        if (player._id === user._id) {
+            console.log(user._id);
+            //pop selected card and put it in tops
+            if (player.tops.length < 3) {
+                player.tops.push(player.deck[idx]);
+                player.deck.splice(idx, 1);
+                game.players[i] = player;
+                console.log(game.players);
+            }
+            break;
+        }
+    }
+};
+
+const selectPlay = (gameId, user, idx) => {
+    console.log("WHAT");
+    //must be in selecting mode
+    //TODO implement bombing out of turn
+    console.log("try to play");
+    console.log(gameId);
+    game = idToGameMap[gameId];
+    console.log(game);
+    if (game.gameState !== "playing" || game.players[0]._id !== user._id) {
+        return false;
+    }
+    // console.log("playing");
+    //TODO implement bombing on turn
+    //TODO implement 2,10,7
+    const player = game.players[0];
+    if (
+        game.pile.length === 0 ||
+        (player.deck[idx].value >= game.pile[game.pile.length - 1].value &&
+            game.pile[game.pile.length - 1].value !== 9) ||
+        (player.deck[idx].value < game.pile[game.pile.length - 1].value &&
+            game.pile[game.pile.length - 1].value === 9)
+    ) {
+        //delete card in hand and put it on top of pile
+        const card = game.players[0].deck.splice(idx, 1)[0];
+        game.pile.push({ value: card.value, suit: card.suit });
+        //draw
+        console.log("redraw time");
+        redraw(game);
+        //TODO implement playing multiple cards logic
+        //rotate players
+        game.players.push(game.players.shift());
+        console.log(game.pile);
+    }
+    //res.send({ 1: "selectPlayDone" });
+};
+
+const take = (gameId, user) => {
+    console.log("????");
+    //must be in selecting mode
+    //TODO implement bombing out of turn
+    // console.log("try to take");
+    game = idToGameMap[gameId];
+    if (
+        game.gameState !== "playing" ||
+        game.players[0]._id !== user._id ||
+        game.pile.length === 0
+    ) {
+        return false;
+    } else {
+        game.players[0].deck.push(...game.pile);
+        game.pile = [];
+        //rotate players
+        game.players.push(game.players.shift());
+        // console.log(game.pile);
+    }
 };
 
 module.exports = {
-  gameState,
-  spawnPlayer,
-  movePlayer,
-  removePlayer,
-  updateGameState,
+    idToGameMap,
+    addPlayerToGame,
+    selectTop,
+    selectPlay,
+    take,
+    readyUp,
 };
