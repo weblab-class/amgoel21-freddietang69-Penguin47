@@ -151,6 +151,14 @@ const Game = (props) => {
                 })}
             </div>
             <div className="text-white"></div>
+            <button
+                className="text-white font-bold"
+                onClick={() => {
+                    post("/api/resetgame", { name: "1" });
+                }}
+            >
+                Reset game
+            </button>
         </>
     );
 };

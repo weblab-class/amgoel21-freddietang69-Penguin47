@@ -226,6 +226,15 @@ router.post("/ready", (req, res) => {
     }
 });
 
+router.post("/resetgame", (req, res) => {
+    Game.findOne({ name: req.body.name }).then((game) => {
+        game.players = [];
+        game.gameState = "waiting";
+        game.deck = [];
+        game.save();
+    });
+});
+
 router.post("/addgameplayer", (req, res) => {
     Game.findOne({ name: req.body.name }).then(async (game) => {
         // console.log("asdf");
