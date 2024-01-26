@@ -49,8 +49,8 @@ const readyUpSelect = (gameId, user) => {
 };
 
 const readyUpPlay = (gameId, user) => {
-  gameLogic.readyUpPlay(gameId, user);
-  sendGameState(gameId);
+    gameLogic.readyUpPlay(gameId, user);
+    sendGameState(gameId);
 };
 
 const selectTop = (gameId, user, idx) => {
@@ -107,9 +107,9 @@ module.exports = {
                 if (user) readyUpSelect(gameId, user);
             });
             socket.on("readyPlay", (gameId) => {
-              const user = getUserFromSocketID(socket.id);
-              if (user) readyUpPlay(gameId, user);
-          });
+                const user = getUserFromSocketID(socket.id);
+                if (user) readyUpPlay(gameId, user);
+            });
 
             socket.on("selectTop", (data) => {
                 const user = getUserFromSocketID(socket.id);

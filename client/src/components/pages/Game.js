@@ -12,8 +12,13 @@ const GameReadyUpScreen = ({ gameID, readySelect }) => {
         }
     };
     return (
-        <div className="text-white">
-            {!readySelect && <button onClick={readyUpSelect}>Ready?</button>}
+        <div className="flex h-80 items-center justify-center">
+            <button
+                class="text-white bg-blue-400 px-4 py-2 rounded-full font-bold"
+                onClick={readyUpSelect}
+            >
+                Click to ready up
+            </button>
         </div>
     );
 };
@@ -147,7 +152,9 @@ const Game = (props) => {
 
     return (
         <>
-            {!readySelect ? (
+            {!props.userId ? (
+                <div class="text-white">Please Log In</div>
+            ) : !readySelect ? (
                 <GameReadyUpScreen gameID={gameID} readySelect={readySelect} />
             ) : (
                 <GamePlayScreen
