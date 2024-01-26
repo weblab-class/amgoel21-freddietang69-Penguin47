@@ -331,6 +331,7 @@ redraw = (game) => {
 router.get("/hi", (req, res) => {
     console.log("hi");
 });
+
 router.post("/selectPlay", (req, res) => {
     console.log("WHAT", req.body);
     Game.findOne({ _id: req.body.game_id }).then((game) => {
@@ -365,8 +366,8 @@ router.post("/selectPlay", (req, res) => {
             console.log(game.pile);
             game.save();
         }
+        res.send({ 1: "selectPlayDone" });
     });
-    res.send({ 1: "selectPlayDone" });
 });
 router.post("/take", (req, res) => {
     console.log("????");
