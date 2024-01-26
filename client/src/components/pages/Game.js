@@ -5,6 +5,8 @@ import Opponent from "./Opponent.js";
 import "../../utilities.css";
 import "./Game.css";
 
+import CardContainer from "../modules/CardContainer.js";
+
 const GameWaiting = ({ gameID, readySelect }) => {
     const readyUpSelect = () => {
         if (gameID !== undefined) {
@@ -28,7 +30,7 @@ const GameWaiting = ({ gameID, readySelect }) => {
 };
 
 const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
-    const [selected, setSelected] = useState(undefined);
+    const [selected, setSelected] = useState([false, false, false, false, false, false]);
 
     const readyUpPlay = () => {
         if (gameID !== undefined) {
@@ -36,30 +38,25 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
         }
     };
 
-    const select = () => {
-        console.log("attempted select");
-        if (selected !== undefined) {
-            console.assert(gameState == "playing");
-            socket.emit("selectTop", { idx: selected, gameId: gameID });
-            setSelected(undefined);
-        }
-    };
+    // const select = () => {
+    //     console.log("attempted select");
+    //     if (selected !== undefined) {
+    //         console.assert(gameState == "playing");
+    //         socket.emit("selectTop", { idx: selected, gameId: gameID });
+    //         setSelected(undefined);
+    //     }
+    // };
 
     return (
         <>
-            <div className="text-white">
+            {/* <div className="text-white">
                 <button onClick={select}>Select</button>
-            </div>
+            </div> */}
             <div className="text-white">
                 <button onClick={readyUpPlay}>Ready?</button>
             </div>
             <div className="text-white">
-                {players.map((player, index) => {
-                    return <Opponent key={index} player={player}></Opponent>;
-                })}
-            </div>
-            <div className="text-white">
-                {playerDeck.map((card, index) => {
+                {/* {playerDeck.map((card, index) => {
                     return selected === index ? (
                         <button
                             className="text-white font-bold underline"
@@ -80,6 +77,17 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
                         >
                             ({card.value} of {card.suit})
                         </button>
+                    );
+                })} */}
+                {playerDeck.map((card, index) => {
+                    return (
+                        <CardContainer
+                            card={card}
+                            width={150}
+                            onClick={() => {
+                                console.log(broo);
+                            }}
+                        />
                     );
                 })}
             </div>
