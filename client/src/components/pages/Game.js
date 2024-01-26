@@ -5,7 +5,7 @@ import Opponent from "./Opponent.js";
 import "../../utilities.css";
 import "./Game.css";
 
-const GameReadyUpScreen = ({ gameID, readySelect }) => {
+const GameWaiting = ({ gameID, readySelect }) => {
     const readyUpSelect = () => {
         if (gameID !== undefined) {
             socket.emit("readySelect", gameID);
@@ -13,17 +13,21 @@ const GameReadyUpScreen = ({ gameID, readySelect }) => {
     };
     return (
         <div className="flex h-80 items-center justify-center">
-            <button
-                class="text-white bg-blue-400 px-4 py-2 rounded-full font-bold"
-                onClick={readyUpSelect}
-            >
-                Click to ready up
-            </button>
+            {!readySelect ? (
+                <button
+                    class="text-white bg-blue-400 px-4 py-2 rounded-full font-bold"
+                    onClick={readyUpSelect}
+                >
+                    Click to ready up
+                </button>
+            ) : (
+                <div class="text-white">Waiting on other players</div>
+            )}
         </div>
     );
 };
 
-const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile, readyPlay }) => {
+const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
     const [selected, setSelected] = useState(undefined);
 
     const readyUpPlay = () => {
@@ -56,7 +60,70 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile, readyPla
                 {gameState !== "waiting" && <button onClick={select}>Select</button>}
             </div>
             <div className="text-white">
-                {!readyPlay && <button onClick={readyUpPlay}>Ready?</button>}
+                <button onClick={readyUpPlay}>Ready?</button>
+            </div>
+            <div className="text-white">
+                {players.map((player, index) => {
+                    return <Opponent key={index} player={player}></Opponent>;
+                })}
+            </div>
+            <div className="text-white">
+                {gameState === "playing" && <button onClick={take}>Take</button>}
+            </div>
+            <div className="text-white">
+                {playerDeck.map((card, index) => {
+                    return selected === index ? (
+                        <button
+                            className="text-white font-bold underline"
+                            onClick={() => {
+                                setSelected(index);
+                            }}
+                            key={index}
+                        >
+                            ({card.value} of {card.suit})
+                        </button>
+                    ) : (
+                        <button
+                            className="text-white"
+                            onClick={() => {
+                                setSelected(index);
+                            }}
+                            key={index}
+                        >
+                            ({card.value} of {card.suit})
+                        </button>
+                    );
+                })}
+            </div>
+        </>
+    );
+};
+
+const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
+    const [selected, setSelected] = useState(undefined);
+
+    const select = () => {
+        console.log("attempted select");
+        if (selected !== undefined) {
+            if (gameState === "selecting") {
+                socket.emit("selectTop", { idx: selected, gameId: gameID });
+                setSelected(undefined);
+            } else if (gameState === "playing") {
+                console.log("playing select");
+                socket.emit("selectPlay", { idx: selected, gameId: gameID });
+                setSelected(undefined);
+            }
+        }
+    };
+
+    const take = () => {
+        socket.emit("take", gameID);
+    };
+
+    return (
+        <>
+            <div className="text-white">
+                {gameState !== "waiting" && <button onClick={select}>Select</button>}
             </div>
             <div className="text-white">
                 {players.map((player, index) => {
@@ -154,8 +221,15 @@ const Game = (props) => {
         <>
             {!props.userId ? (
                 <div class="text-white">Please Log In</div>
-            ) : !readySelect ? (
-                <GameReadyUpScreen gameID={gameID} readySelect={readySelect} />
+            ) : gameState === "waiting" ? (
+                <GameWaiting gameID={gameID} readySelect={readySelect} />
+            ) : !readyPlay ? (
+                <GameSelecting
+                    gameID={gameID}
+                    gameState={gameState}
+                    players={players}
+                    playerDeck={playerDeck}
+                />
             ) : (
                 <GamePlayScreen
                     gameID={gameID}
@@ -163,7 +237,6 @@ const Game = (props) => {
                     players={players}
                     playerDeck={playerDeck}
                     pile={pile}
-                    readyPlay={readyPlay}
                 />
             )}
         </>
