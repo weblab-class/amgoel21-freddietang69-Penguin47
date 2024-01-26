@@ -389,8 +389,8 @@ router.post("/take", (req, res) => {
         sendState(game);
         // console.log(game.pile);
         game.save();
+        res.send({ 1: "bye" });
     });
-    res.send({ 1: "bye" });
 });
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
