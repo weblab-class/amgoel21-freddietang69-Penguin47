@@ -1,58 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { socket } from "../../client-socket.js";
 import { get, post } from "../../utilities";
-import { handleInput } from "../../input";
 import Opponent from "./Opponent.js";
 import "../../utilities.css";
 import "./Game.css";
 
-const Game = (props) => {
-    const [gameID, setgameID] = useState(undefined);
-    const [ready, setReady] = useState(false);
-    const [tops, setTops] = useState([]);
-    const [bottoms, setBottoms] = useState(3);
-    const [deck, setDeck] = useState(0);
-    const [playerDeck, setplayerDeck] = useState([]);
-    const [players, setPlayers] = useState([]);
-    const [selected, setSelected] = useState(undefined);
-    const [pile, setPile] = useState([]);
-    // 0 = not started
-    const [gameState, setgameState] = useState("waiting");
-
-    useEffect(() => {
-        if (props.userId) {
-            post("/api/addgameplayer", { name: "test" }).then((data) => {
-                setgameID(data);
-            });
-        }
-    }, [props.userId]);
-
-    // update game periodically
-    useEffect(() => {
-        socket.on("update", (update) => {
-            processUpdate(update);
-        });
-        return () => {
-            socket.off("update", (update) => {
-                processUpdate(update);
-            });
-        };
-    }, []);
-
-    const processUpdate = (update) => {
-        setReady(update.ready);
-        setgameState(update.gameState);
-        setTops(update.players[update.player_pos].tops);
-        setBottoms(update.players[update.player_pos].bottoms);
-        setplayerDeck(update.player_deck);
-        setPlayers(update.players);
-        setDeck(update.deck);
-        setPile(update.pile);
-    };
-
-    const readyUp = () => {
+const GameReadyUpScreen = ({ gameID, readySelect }) => {
+    const readyUpSelect = () => {
         if (gameID !== undefined) {
-            socket.emit("ready", gameID);
+            socket.emit("readySelect", gameID);
+        }
+    };
+    return (
+        <div className="text-white">
+            {!readySelect && <button onClick={readyUpSelect}>Ready?</button>}
+        </div>
+    );
+};
+
+const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile, readyPlay }) => {
+    const [selected, setSelected] = useState(undefined);
+
+    const readyUpPlay = () => {
+        if (gameID !== undefined) {
+            socket.emit("readyPlay", gameID);
         }
     };
 
@@ -79,7 +50,9 @@ const Game = (props) => {
             <div className="text-white">
                 {gameState !== "waiting" && <button onClick={select}>Select</button>}
             </div>
-            <div className="text-white">{!ready && <button onClick={readyUp}>Ready?</button>}</div>
+            <div className="text-white">
+                {!readyPlay && <button onClick={readyUpPlay}>Ready?</button>}
+            </div>
             <div className="text-white">
                 {players.map((player, index) => {
                     return <Opponent key={index} player={player}></Opponent>;
@@ -124,6 +97,68 @@ const Game = (props) => {
                 })}
             </div>
             <div className="text-white"></div>
+        </>
+    );
+};
+
+const Game = (props) => {
+    const [gameID, setgameID] = useState(undefined);
+    const [readySelect, setReadySelect] = useState(false);
+    const [readyPlay, setReadyPlay] = useState(false);
+    const [tops, setTops] = useState([]);
+    const [bottoms, setBottoms] = useState(3);
+    const [deck, setDeck] = useState(0);
+    const [playerDeck, setplayerDeck] = useState([]);
+    const [players, setPlayers] = useState([]);
+    const [pile, setPile] = useState([]);
+    const [gameState, setgameState] = useState("waiting");
+
+    useEffect(() => {
+        if (props.userId) {
+            post("/api/addgameplayer", { name: "test" }).then((data) => {
+                setgameID(data);
+            });
+        }
+    }, [props.userId]);
+
+    // update game periodically
+    useEffect(() => {
+        socket.on("update", (update) => {
+            processUpdate(update);
+        });
+        return () => {
+            socket.off("update", (update) => {
+                processUpdate(update);
+            });
+        };
+    }, []);
+
+    const processUpdate = (update) => {
+        setReadySelect(update.readySelect);
+        setReadyPlay(update.readyPlay);
+        setgameState(update.gameState);
+        setTops(update.players[update.player_pos].tops);
+        setBottoms(update.players[update.player_pos].bottoms);
+        setplayerDeck(update.player_deck);
+        setPlayers(update.players);
+        setDeck(update.deck);
+        setPile(update.pile);
+    };
+
+    return (
+        <>
+            {!readySelect ? (
+                <GameReadyUpScreen gameID={gameID} readySelect={readySelect} />
+            ) : (
+                <GamePlayScreen
+                    gameID={gameID}
+                    gameState={gameState}
+                    players={players}
+                    playerDeck={playerDeck}
+                    pile={pile}
+                    readyPlay={readyPlay}
+                />
+            )}
         </>
     );
 };

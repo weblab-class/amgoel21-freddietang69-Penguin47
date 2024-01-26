@@ -38,11 +38,13 @@ const addPlayerToGame = (gameId, user) => {
             deck: [],
             tops: [],
             bottoms: [],
+            readyToSelect: false,
+            readyToPlay: false,
         });
     }
 };
 
-const readyUp = (gameId, user) => {
+const readyUpSelect = (gameId, user) => {
     console.log(user._id);
     const game = idToGameMap[gameId];
 
@@ -54,16 +56,8 @@ const readyUp = (gameId, user) => {
         if (player._id === user._id) {
             console.log("found " + user._id);
             found = true;
-            if (player.ready) return true;
-            //only reading in the selecting stage once player has selected all top cards
-            if (game.gameState == "selecting") {
-                if (player.tops.length < 3) {
-                    return false;
-                }
-            }
-            player.ready = true;
-            game.players[i] = player;
-            // console.log(game.players);
+            if (player.readyToSelect) return true;
+            player.readyToSelect = true;
             break;
         }
     }
@@ -71,13 +65,40 @@ const readyUp = (gameId, user) => {
     if (
         found &&
         game.players.length > 1 &&
-        game.players.filter((player) => !player.ready).length == 0
+        game.players.filter((player) => !player.readyToSelect).length == 0
     ) {
-        if (game.gameState === "selecting") {
-            startGame(game);
-        } else if (game.gameState == "waiting") {
-            startSelect(game);
+        startSelect(game);
+    }
+};
+
+const readyUpPlay = (gameId, user) => {
+    console.log(user._id);
+    const game = idToGameMap[gameId];
+
+    let found = false;
+    for (let i = 0; i < game.players.length; i++) {
+        const player = game.players[i];
+        if (player._id === user._id) {
+            console.log("found " + user._id);
+            found = true;
+            if (player.readyToPlay) return true;
+            //only reading in the selecting stage once player has selected all top cards
+            if (game.gameState == "selecting") {
+                if (player.tops.length < 3) {
+                    return false;
+                }
+            }
+            player.readyToPlay = true;
+            break;
         }
+    }
+
+    if (
+        found &&
+        game.players.length > 1 &&
+        game.players.filter((player) => !player.readyToPlay).length == 0
+    ) {
+        startGame(game);
     }
 };
 
@@ -228,5 +249,6 @@ module.exports = {
     selectTop,
     selectPlay,
     take,
-    readyUp,
+    readyUpSelect,
+    readyUpPlay,
 };

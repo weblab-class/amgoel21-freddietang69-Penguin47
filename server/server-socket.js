@@ -28,7 +28,8 @@ const sendGameState = (gameId) => {
     let i = 0;
     for (const player of game.players) {
         to_send.player_deck = player.deck;
-        to_send.ready = player.ready;
+        to_send.readySelect = player.readyToSelect;
+        to_send.readyPlay = player.readyToPlay;
         to_send.player_pos = i;
         i++;
         // console.log(player._id, to_send);
@@ -42,9 +43,14 @@ const addPlayerToGame = (gameId, user) => {
     sendGameState(gameId);
 };
 
-const readyUp = (gameId, user) => {
-    gameLogic.readyUp(gameId, user);
+const readyUpSelect = (gameId, user) => {
+    gameLogic.readyUpSelect(gameId, user);
     sendGameState(gameId);
+};
+
+const readyUpPlay = (gameId, user) => {
+  gameLogic.readyUpPlay(gameId, user);
+  sendGameState(gameId);
 };
 
 const selectTop = (gameId, user, idx) => {
@@ -96,10 +102,15 @@ module.exports = {
                 removeUser(user, socket);
             });
 
-            socket.on("ready", (gameId) => {
+            socket.on("readySelect", (gameId) => {
                 const user = getUserFromSocketID(socket.id);
-                if (user) readyUp(gameId, user);
+                if (user) readyUpSelect(gameId, user);
             });
+            socket.on("readyPlay", (gameId) => {
+              const user = getUserFromSocketID(socket.id);
+              if (user) readyUpPlay(gameId, user);
+          });
+
             socket.on("selectTop", (data) => {
                 const user = getUserFromSocketID(socket.id);
                 if (user) selectTop(data.gameId, user, data.idx);
@@ -123,9 +134,5 @@ module.exports = {
     getSocketFromSocketID: getSocketFromSocketID,
     addPlayerToGame: addPlayerToGame,
     sendGameState: sendGameState,
-    readyUp: readyUp,
-    selectTop: selectTop,
-    selectPlay: selectPlay,
-    take: take,
     getIo: () => io,
 };
