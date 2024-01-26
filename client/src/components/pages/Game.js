@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { socket } from "../../client-socket.js";
 import { post } from "../../utilities";
 import Opponent from "./Opponent.js";
@@ -31,9 +31,13 @@ const GameWaiting = ({ gameID, readySelect }) => {
 
 const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
     const [selected, setSelected] = useState([false, false, false, false, false, false]);
+    const locked = useRef(false);
 
     const readyUpPlay = () => {
-        if (gameID !== undefined) {
+        if (gameID !== undefined && selected.filter((val) => val).length == 3) {
+            locked.current = true;
+            console.log(selected);
+            socket.emit("selectTop", { gameId: gameID, selected: selected });
             socket.emit("readyPlay", gameID);
         }
     };
@@ -49,45 +53,28 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
 
     return (
         <>
-            {/* <div className="text-white">
-                <button onClick={select}>Select</button>
-            </div> */}
             <div className="text-white">
                 <button onClick={readyUpPlay}>Ready?</button>
             </div>
-            <div className="text-white">
-                {/* {playerDeck.map((card, index) => {
-                    return selected === index ? (
-                        <button
-                            className="text-white font-bold underline"
-                            onClick={() => {
-                                setSelected(index);
-                            }}
-                            key={index}
-                        >
-                            ({card.value} of {card.suit})
-                        </button>
-                    ) : (
-                        <button
-                            className="text-white"
-                            onClick={() => {
-                                setSelected(index);
-                            }}
-                            key={index}
-                        >
-                            ({card.value} of {card.suit})
-                        </button>
-                    );
-                })} */}
+            <div className="grid grid-cols-3 gap-4">
                 {playerDeck.map((card, index) => {
                     return (
-                        <CardContainer
-                            card={card}
-                            width={150}
-                            onClick={() => {
-                                console.log(broo);
-                            }}
-                        />
+                        <div class="grid place-items-center">
+                            <CardContainer
+                                card={card}
+                                width={150}
+                                highlighted={!locked.current && selected[index]}
+                                onClick={() => {
+                                    if (!locked.current) {
+                                        const newSelected = [...selected];
+                                        newSelected[index] = !selected[index];
+                                        setSelected(newSelected);
+                                        // console.log(index);
+                                        // console.log(selected);
+                                    }
+                                }}
+                            />
+                        </div>
                     );
                 })}
             </div>
@@ -119,6 +106,7 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
             </div>
             <div className="text-white">
                 {players.map((player, index) => {
+                    console.log(players);
                     return <Opponent key={index} player={player}></Opponent>;
                 })}
             </div>
@@ -215,7 +203,7 @@ const Game = (props) => {
                 <div class="text-white">Please Log In</div>
             ) : gameState === "waiting" ? (
                 <GameWaiting gameID={gameID} readySelect={readySelect} />
-            ) : !readyPlay ? (
+            ) : gameState === "selecting" ? (
                 <GameSelecting
                     gameID={gameID}
                     gameState={gameState}
