@@ -102,6 +102,7 @@ router.post("/makegame", (req, res) => {
     game.save();
     res.send(game._id);
 });
+
 sendState = (game) => {
     to_send = {
         players: game.players.map((player) => {
@@ -231,6 +232,7 @@ router.post("/resetgame", (req, res) => {
         game.players = [];
         game.gameState = "waiting";
         game.deck = [];
+        game.pile = [];
         game.save();
     });
 });
@@ -286,6 +288,7 @@ router.get("/user", auth.ensureLoggedIn, (req, res) => {
         res.send(data);
     });
 });
+
 router.post("/selectTop", (req, res) => {
     if (req.user) {
         Game.findOne({ _id: req.body.game_id }).then((game) => {
@@ -314,6 +317,7 @@ router.post("/selectTop", (req, res) => {
         });
     }
 });
+
 redraw = (game) => {
     if (game.deck.length > 0 && game.players[0].deck.length < 3) {
         game.players[0].deck.push(game.deck.pop());
@@ -328,6 +332,7 @@ redraw = (game) => {
         }
     }
 };
+
 router.get("/hi", (req, res) => {
     console.log("hi");
 });
@@ -369,6 +374,7 @@ router.post("/selectPlay", (req, res) => {
         res.send({ 1: "selectPlayDone" });
     });
 });
+
 router.post("/take", (req, res) => {
     console.log("????");
     Game.findOne({ _id: req.body.game_id }).then((game) => {
@@ -393,6 +399,7 @@ router.post("/take", (req, res) => {
         res.send({ 1: "bye" });
     });
 });
+
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
     console.log(`API route not found: ${req.method} ${req.url}`);

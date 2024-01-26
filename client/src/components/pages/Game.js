@@ -125,7 +125,7 @@ const Game = (props) => {
                             }}
                             key={index}
                         >
-                            {JSON.stringify(card)}
+                            ({card.value} of {card.suit})
                         </button>
                     ) : (
                         <button
@@ -135,7 +135,7 @@ const Game = (props) => {
                             }}
                             key={index}
                         >
-                            {JSON.stringify(card)}
+                            ({card.value} of {card.suit})
                         </button>
                     );
                 })}
@@ -145,7 +145,7 @@ const Game = (props) => {
                 {pile.map((card, index) => {
                     return (
                         <div key={index} className="text-white">
-                            {JSON.stringify(card)}
+                            ({card.value} of {card.suit})
                         </div>
                     );
                 })}

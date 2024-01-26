@@ -37,19 +37,25 @@ const GameScheme = new mongoose.Schema({
             },
         },
     ],
-    gameState: String,
-    deck: [
-        {
-            suit: String,
-            value: Number,
-        },
-    ],
-    pile: [
-        {
-            suit: String,
-            value: Number,
-        },
-    ],
+    gameState: { type: String, default: "waiting" },
+    deck: {
+        type: [
+            {
+                suit: String,
+                value: Number,
+            },
+        ],
+        default: [],
+    },
+    pile: {
+        type: [
+            {
+                suit: String,
+                value: Number,
+            },
+        ],
+        default: [],
+    },
 });
 
 module.exports = mongoose.model("game", GameScheme);
