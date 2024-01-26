@@ -21,8 +21,8 @@ const Game = (props) => {
 
     // add event listener on mount
     useEffect(() => {
-        console.log("what");
-        console.log(props.userId);
+        // console.log("what");
+        // console.log(props.userId);
         if (props.userId) {
             get("/api/user", { _id: props.userId }).then((data) => {
                 const body = { user: data, name: "1" };
@@ -34,7 +34,7 @@ const Game = (props) => {
                 });
             });
         } else {
-            console.log("something");
+            // console.log("something");
         }
     }, [props.userId]);
 

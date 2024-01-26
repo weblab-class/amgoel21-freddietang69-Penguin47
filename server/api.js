@@ -235,24 +235,11 @@ router.post("/addgameplayer", (req, res) => {
             let alreadyInGame = false; // MAKE SURE WE DONT ADD SAME PLAYER MULTIPLE TIMES
             for (player of game.players) alreadyInGame |= player._id == req.body.user._id;
             if (!alreadyInGame) {
-                await Game.updateOne(
-                    { _id: game._id },
-                    {
-                        $set: {
-                            //  players: [],
-                            players: game.players.concat([
-                                {
-                                    _id: req.body.user._id,
-                                    name: req.body.user.name,
-                                    deck: [],
-                                    tops: [],
-                                    bottoms: [],
-                                    ready: false,
-                                },
-                            ]),
-                        },
-                    }
-                );
+                game.players.push({
+                    _id: req.body.user._id,
+                    name: req.body.user.name,
+                });
+                game.save();
             }
             res.send(game._id);
         } else {
