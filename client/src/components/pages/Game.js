@@ -24,18 +24,19 @@ const Game = (props) => {
         // console.log("what");
         // console.log(props.userId);
         if (props.userId) {
-            get("/api/user", { _id: props.userId }).then((data) => {
-                const body = { user: data, name: "1" };
-                // post("/api/makegame", body).then((data) => {
-                //   setgameID(data);
-                // });
-                post("/api/addgameplayer", body).then((data) => {
-                    setgameID(data);
-                });
+            // get("/api/user", { _id: props.userId }).then((data) => {
+            //     const body = { user: data, name: "1" };
+            // post("/api/makegame", body).then((data) => {
+            //   setgameID(data);
+            // });
+            post("/api/addgameplayer", { name: "1" }).then((data) => {
+                setgameID(data);
             });
-        } else {
-            // console.log("something");
+            // });
         }
+        // } else {
+        //     // console.log("something");
+        // }
     }, [props.userId]);
 
     // update game periodically
@@ -63,13 +64,13 @@ const Game = (props) => {
 
     const readyUp = () => {
         if (gameID !== undefined) {
-            get("/api/user", { _id: props.userId }).then((data) => {
-                post("/api/ready", { game_id: gameID, user: data }).then((data) => {
-                    if (data) {
-                        setReady(true);
-                    }
-                });
+            //get("/api/user", { _id: props.userId }).then((data) => {
+            post("/api/ready", { game_id: gameID }).then((data) => {
+                if (data) {
+                    setReady(true);
+                }
             });
+            //});
         }
     };
     // display text if the player is not logged in

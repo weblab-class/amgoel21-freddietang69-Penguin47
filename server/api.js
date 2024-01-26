@@ -242,13 +242,13 @@ router.post("/addgameplayer", (req, res) => {
         // console.log("asdf");
         console.log("Trying to add a player to: ", game._id);
 
-        if (req.body.user) {
+        if (req.user) {
             let alreadyInGame = false; // MAKE SURE WE DONT ADD SAME PLAYER MULTIPLE TIMES
-            for (player of game.players) alreadyInGame |= player._id == req.body.user._id;
+            for (player of game.players) alreadyInGame |= player._id == req.user._id;
             if (!alreadyInGame) {
                 game.players.push({
-                    _id: req.body.user._id,
-                    name: req.body.user.name,
+                    _id: req.user._id,
+                    name: req.user.name,
                 });
                 game.save();
             }
@@ -338,7 +338,7 @@ router.get("/hi", (req, res) => {
 });
 
 router.post("/selectPlay", (req, res) => {
-    console.log("WHAT", req.body);
+    console.log("WHAT");
     Game.findOne({ _id: req.body.game_id }).then((game) => {
         //must be in selecting mode
         //TODO implement bombing out of turn
