@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { socket } from "../../client-socket.js";
-import { get, post } from "../../utilities";
+import { post } from "../../utilities";
 import Opponent from "./Opponent.js";
 import "../../utilities.css";
 import "./Game.css";
@@ -39,25 +39,16 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
     const select = () => {
         console.log("attempted select");
         if (selected !== undefined) {
-            if (gameState === "selecting") {
-                socket.emit("selectTop", { idx: selected, gameId: gameID });
-                setSelected(undefined);
-            } else if (gameState === "playing") {
-                console.log("playing select");
-                socket.emit("selectPlay", { idx: selected, gameId: gameID });
-                setSelected(undefined);
-            }
+            console.assert(gameState == "playing");
+            socket.emit("selectTop", { idx: selected, gameId: gameID });
+            setSelected(undefined);
         }
-    };
-
-    const take = () => {
-        socket.emit("take", gameID);
     };
 
     return (
         <>
             <div className="text-white">
-                {gameState !== "waiting" && <button onClick={select}>Select</button>}
+                <button onClick={select}>Select</button>
             </div>
             <div className="text-white">
                 <button onClick={readyUpPlay}>Ready?</button>
@@ -66,9 +57,6 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
                 {players.map((player, index) => {
                     return <Opponent key={index} player={player}></Opponent>;
                 })}
-            </div>
-            <div className="text-white">
-                {gameState === "playing" && <button onClick={take}>Take</button>}
             </div>
             <div className="text-white">
                 {playerDeck.map((card, index) => {
@@ -105,14 +93,10 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
     const select = () => {
         console.log("attempted select");
         if (selected !== undefined) {
-            if (gameState === "selecting") {
-                socket.emit("selectTop", { idx: selected, gameId: gameID });
-                setSelected(undefined);
-            } else if (gameState === "playing") {
-                console.log("playing select");
-                socket.emit("selectPlay", { idx: selected, gameId: gameID });
-                setSelected(undefined);
-            }
+            console.assert(gameState == "playing");
+            console.log("playing select");
+            socket.emit("selectPlay", { idx: selected, gameId: gameID });
+            setSelected(undefined);
         }
     };
 
@@ -123,7 +107,7 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
     return (
         <>
             <div className="text-white">
-                {gameState !== "waiting" && <button onClick={select}>Select</button>}
+                <button onClick={select}>Select</button>
             </div>
             <div className="text-white">
                 {players.map((player, index) => {
@@ -131,7 +115,7 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
                 })}
             </div>
             <div className="text-white">
-                {gameState === "playing" && <button onClick={take}>Take</button>}
+                <button onClick={take}>Take</button>
             </div>
             <div className="text-white">
                 {playerDeck.map((card, index) => {
