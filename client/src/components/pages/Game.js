@@ -42,15 +42,6 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
         }
     };
 
-    // const select = () => {
-    //     console.log("attempted select");
-    //     if (selected !== undefined) {
-    //         console.assert(gameState == "playing");
-    //         socket.emit("selectTop", { idx: selected, gameId: gameID });
-    //         setSelected(undefined);
-    //     }
-    // };
-
     return (
         <>
             <div className="text-white">
@@ -113,31 +104,24 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
             <div className="text-white">
                 <button onClick={take}>Take</button>
             </div>
-            <div className="text-white">
+
+            <div className="grid grid-cols-3 gap-4">
                 {playerDeck.map((card, index) => {
-                    return selected === index ? (
-                        <button
-                            className="text-white font-bold underline"
-                            onClick={() => {
-                                setSelected(index);
-                            }}
-                            key={index}
-                        >
-                            ({card.value} of {card.suit})
-                        </button>
-                    ) : (
-                        <button
-                            className="text-white"
-                            onClick={() => {
-                                setSelected(index);
-                            }}
-                            key={index}
-                        >
-                            ({card.value} of {card.suit})
-                        </button>
+                    return (
+                        <div class="grid place-items-center">
+                            <CardContainer
+                                card={card}
+                                width={150}
+                                highlighted={selected === index}
+                                onClick={() => {
+                                    setSelected(index);
+                                }}
+                            />
+                        </div>
                     );
                 })}
             </div>
+
             <div className="text-white">
                 <h3>Pile</h3>
                 {pile.map((card, index) => {

@@ -11,7 +11,7 @@ const images = require.context("../../cards", true);
  * card.value -> an integer
  * card.suit -> the suit of the card
  */
-const CardContainer = ({ card, width, onClick, highlighted }) => {
+const CardContainer = ({ card, width = 150, onClick = () => {}, highlighted = false }) => {
     const image = images("./" + card.value.toString() + "_of_" + card.suit + ".png");
     return (
         <>

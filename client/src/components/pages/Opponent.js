@@ -1,23 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
-import { socket } from "../../client-socket.js";
-import { get, post } from "../../utilities";
-import { handleInput } from "../../input";
+import React from "react";
 
-import "../../utilities.css";
-import "./Game.css";
+import CardContainer from "../modules/CardContainer";
+
 const Opponent = (props) => {
     return (
         <span className="text-white">
-            <div>{props.player.name}</div>
             <div>
+                ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </div>
+            <div>Player name: {props.player.name}</div>
+            <div class="grid grid-cols-3">
                 {props.player.tops.map((card) => (
-                    <div>
-                        ({card.value} of {card.suit})
-                    </div>
+                    <CardContainer card={card} width={75} />
                 ))}
             </div>
-            <div>cards in hand {props.player.deck}</div>
-            <div>cards in bottom {props.player.bottoms}</div>
+            <div>{props.player.deck} cards in hand </div>
+            <div>{props.player.bottoms} cards in bottom</div>
+            <div>
+                -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </div>
         </span>
     );
 };
