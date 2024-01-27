@@ -1,10 +1,11 @@
 import React from "react";
 import "./Rules.css";
-import logo from "../../corgi.jpg";
+import NavBar from "../modules/NavBar.js";
 
-const Rules = () => {
+const Rules = ({ userId, handleLogin, handleLogout }) => {
   return (
     <div>
+      <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
       <h1 class="underline decoration-2 mb-4 text-xl flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-5xl lg:text-6xl dark:text-white">
         Rules of Palace
       </h1>

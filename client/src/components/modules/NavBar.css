@@ -6,7 +6,34 @@
 } */
 
 .NavBar-link {
-  padding: var(--s) var(--m);
-  color: gray;
-  text-decoration: none;
+    padding: var(--s) var(--m);
+    color: gray;
+    text-decoration: none;
 }
+
+.NavBar-container {
+    position: relative;
+    height: 7vh;
+    background-color: aqua;
+    display: block;
+}
+
+/* .main-nav-container {
+    background: #272727;
+    height: 7.4vh;
+    width: 100%;
+    border-bottom: 0.5vh solid #2c2c2c;
+    box-sizing: border-box;
+    z-index: 2;
+    position: relative;
+    display: block;
+}
+
+.main-logo-container {
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 20%;
+} */

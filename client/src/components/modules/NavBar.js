@@ -9,7 +9,7 @@ import { GoogleOAuthProvider, GoogleLogin, googleLogout } from "@react-oauth/goo
 const GOOGLE_CLIENT_ID = "707563753460-4ihlvt7ht9nsnrfsvj1j5r676kiommac.apps.googleusercontent.com";
 
 const NavBar = ({ userId, handleLogin, handleLogout }) => {
-    const [userName, setUserName] = useState("default");
+    const [userName, setUserName] = useState("");
     useEffect(() => {
         if (userId) {
             get("/api/user", { _id: userId }).then((data) => {
@@ -19,8 +19,9 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
     }, [userId]);
 
     return (
-        <nav className="bg-teal-300 h-8 flex">
-            <div className="inline-block w-4/6">
+        <div className="NavBar-container">
+            <div className="absolute left-0 top-0 h-full w-1/5"> Palace </div>
+            <div className="absolute left-[20%] top-0 h-full w-3/5 ">
                 <Link to="/" className="NavBar-link">
                     Home
                 </Link>
@@ -40,7 +41,7 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                     game
                 </Link>
             </div>
-            <div className="inline-block">
+            <div className="absolute left-[80%] top-0 h-full w-1/5">
                 <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                     {userId ? (
                         <button
@@ -60,9 +61,9 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                         />
                     )}
                 </GoogleOAuthProvider>
+                <div className="inline-block pl-4">{userName}</div>
             </div>
-            <div className="inline-block pl-4">{userName}</div>
-        </nav>
+        </div>
     );
 };
 

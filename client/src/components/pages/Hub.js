@@ -1,5 +1,6 @@
 import React from "react";
 
+import NavBar from "../modules/NavBar.js";
 import LobbyList from "../modules/LobbyList.js";
 
 /**
@@ -8,15 +9,16 @@ import LobbyList from "../modules/LobbyList.js";
  * Proptypes
  * @param {string} userId
  */
-const Hub = (props) => {
-  //console.log("hub", props.userId);
-  return (
-    <>
-      <LobbyList userId={props.userId} />
-      <div className="text-white">todo: make lobbies</div>
-      <div className="text-white">yaaaaaaa</div>
-    </>
-  );
+const Hub = ({ userId, handleLogin, handleLogout }) => {
+    //console.log("hub", props.userId);
+    return (
+        <>
+            <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+            <LobbyList userId={userId} />
+            <div className="text-white">todo: make lobbies</div>
+            <div className="text-white">yaaaaaaa</div>
+        </>
+    );
 };
 
 export default Hub;
