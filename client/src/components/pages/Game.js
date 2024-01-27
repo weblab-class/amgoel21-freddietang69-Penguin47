@@ -6,11 +6,12 @@ import "../../utilities.css";
 import "./Game.css";
 
 import CardContainer from "../modules/CardContainer.js";
+import { useParams } from "react-router-dom";
 
-const GameWaiting = ({ gameID, readySelect }) => {
+const GameWaiting = ({ gameId, readySelect }) => {
     const readyUpSelect = () => {
-        if (gameID !== undefined) {
-            socket.emit("readySelect", gameID);
+        if (gameId !== undefined) {
+            socket.emit("readySelect", gameId);
         }
     };
     return (
@@ -29,16 +30,16 @@ const GameWaiting = ({ gameID, readySelect }) => {
     );
 };
 
-const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
+const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
     const [selected, setSelected] = useState([false, false, false, false, false, false]);
     const locked = useRef(false);
 
     const readyUpPlay = () => {
-        if (gameID !== undefined && selected.filter((val) => val).length == 3) {
+        if (gameId !== undefined && selected.filter((val) => val).length == 3) {
             locked.current = true;
             console.log(selected);
-            socket.emit("selectTop", { gameId: gameID, selected: selected });
-            socket.emit("readyPlay", gameID);
+            socket.emit("selectTop", { gameId: gameId, selected: selected });
+            socket.emit("readyPlay", gameId);
         }
     };
 
@@ -100,7 +101,7 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
     };
 
     const take = () => {
-        socket.emit("take", gameID);
+        socket.emit("take", gameId);
     };
 
     return (
@@ -152,8 +153,9 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
     );
 };
 
-const Game = (props) => {
-    const [gameID, setgameID] = useState(undefined);
+const Game = ({ userId }) => {
+    // const [gameId, setgameId] = useState(undefined);
+    const gameId = useParams().gameId;
     const [readySelect, setReadySelect] = useState(false);
     const [readyPlay, setReadyPlay] = useState(false);
     const [tops, setTops] = useState([]);
@@ -165,12 +167,11 @@ const Game = (props) => {
     const [gameState, setgameState] = useState("waiting");
 
     useEffect(() => {
-        if (props.userId) {
-            post("/api/addgameplayer", { name: "test" }).then((data) => {
-                setgameID(data);
-            });
+        if (userId) {
+            console.log(userId, gameId);
+            post("/api/addgameplayer", { gameId: gameId });
         }
-    }, [props.userId]);
+    }, [userId]);
 
     // update game periodically
     useEffect(() => {
@@ -198,20 +199,20 @@ const Game = (props) => {
 
     return (
         <>
-            {!props.userId ? (
+            {!userId ? (
                 <div class="text-white">Please Log In</div>
             ) : gameState === "waiting" ? (
-                <GameWaiting gameID={gameID} readySelect={readySelect} />
+                <GameWaiting gameId={gameId} readySelect={readySelect} />
             ) : gameState === "selecting" ? (
                 <GameSelecting
-                    gameID={gameID}
+                    gameId={gameId}
                     gameState={gameState}
                     players={players}
                     playerDeck={playerDeck}
                 />
             ) : (
                 <GamePlayScreen
-                    gameID={gameID}
+                    gameId={gameId}
                     gameState={gameState}
                     players={players}
                     playerDeck={playerDeck}
