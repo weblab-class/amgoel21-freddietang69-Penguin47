@@ -11,21 +11,21 @@ const getRandomInt = (min, max) => {
 
 idToGameMap = {};
 
-const makeGame = (name, creator = "billy bob joe") => {
+const makeGame = (name, gameId, creator = "billy bob joe") => {
     //console.log(Object.keys(idToGameMap).length);
     game = {
         name: name,
-        _id: Object.keys(idToGameMap).length,
+        _id: gameId,
         creator: creator,
         players: [],
         gameState: "waiting",
         deck: [],
         pile: [],
     };
-    idToGameMap[game._id] = game;
+    idToGameMap[gameId] = game;
 };
 
-makeGame("test");
+// makeGame("test");
 
 const addPlayerToGame = (gameId, user) => {
     game = idToGameMap[gameId];
@@ -245,6 +245,7 @@ const take = (gameId, user) => {
 
 module.exports = {
     idToGameMap,
+    makeGame,
     addPlayerToGame,
     selectTop,
     selectPlay,

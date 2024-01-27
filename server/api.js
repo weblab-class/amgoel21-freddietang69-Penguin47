@@ -53,15 +53,15 @@ router.get("/lobbies", (req, res) => {
 });
 
 router.post("/makelobby", (req, res) => {
-    console.log(req.body.user);
+    console.log(req.user);
     console.log("MAKING");
     const lobby = new Lobby({
         name: req.body.name,
-        creator: req.body.user._id,
+        creator: req.user._id,
         players: [
             {
-                _id: req.body.user._id,
-                name: req.body.user.name,
+                _id: req.user._id,
+                name: req.user.name,
             },
         ],
     });
@@ -72,6 +72,8 @@ router.post("/makelobby", (req, res) => {
             console.log("yay");
             lobby.save().then((data) => {
                 console.log(data);
+                gameLogic.makeGame(req.body.name, lobby._id);
+                res.send(lobby._id);
             });
             //   game.save();
             socketManager.getIo().emit("lobby", lobby);
@@ -86,44 +88,41 @@ router.post("/makelobby", (req, res) => {
 });
 
 router.post("/addgameplayer", (req, res) => {
-    console.log("Trying to add a player to: ", req.body.name);
-    if (req.user) {
-        let gameId = -1;
-        for (const [id, game] of Object.entries(gameLogic.idToGameMap)) {
-            //console.log(id);
-            if (game.name === req.body.name) {
-                gameId = id;
-                break;
-            }
+    console.log("Trying to add a player to gameId: ", req.body.gameId);
+    if (req.body.gameId in gameLogic.idToGameMap) {
+        if (req.user) {
+            // console.log("gameId " + gameId);
+            socketManager.addPlayerToGame(req.body.gameId, req.user);
+            // res.send(gameId);
+        } else {
+            console.log("Error: Could not add nonexistent user to game!");
         }
-        // console.log("gameId " + gameId);
-        socketManager.addPlayerToGame(gameId, req.user);
-        res.send(gameId);
     } else {
-        console.log("Error: Could not add nonexistent user to game!");
+        res.send("error: gameId does not exist");
     }
 });
 
-router.post("/addlobbyplayer", async (req, res) => {
+router.post("/addlobbyplayer", (req, res) => {
     //console.log(req.body.lobby);
     //console.log(req.body.userId);
     //dont create lobby if it exists
     // if (!(await Lobby.find({ _id: req.body.lobby._id }))) {
-    await Lobby.updateOne(
+    Lobby.updateOne(
         { _id: req.body.lobby._id },
         {
             $set: {
                 players: req.body.lobby.players.concat([
                     {
-                        _id: req.body.user._id,
-                        name: req.body.user.name,
+                        _id: req.user._id,
+                        name: req.user.name,
                     },
                 ]),
             },
         }
-    );
-    // }
-    socketManager.getIo().emit("lobby", "hi");
+    ).then((data) => {
+        socketManager.getIo().emit("lobby", "hi");
+        res.send({ _id: req.body.lobby._id });
+    });
 });
 
 router.get("/user", auth.ensureLoggedIn, (req, res) => {
