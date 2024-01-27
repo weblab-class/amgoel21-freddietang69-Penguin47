@@ -74,15 +74,28 @@ const GameSelecting = ({ gameID, gameState, players, playerDeck }) => {
 };
 
 const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
-    const [selected, setSelected] = useState(undefined);
+    const [selected, setSelected] = useState(new Set());
+    // Adding a value
+    const addToSelected = (newValue) => {
+        console.log(newValue);
+        if (selected.has(newValue)) {
+            const newSet = new Set([...selected].filter((value) => value !== newValue));
+            setSelected(newSet);
+        } else {
+            const newSet = new Set([...selected, newValue]);
+            console.log(newSet);
+            setSelected(newSet);
+        }
+    };
 
     const select = () => {
         console.log("attempted select");
-        if (selected !== undefined) {
+        if (selected.size !== 0) {
             console.assert(gameState == "playing");
             console.log("playing select");
-            socket.emit("selectPlay", { idx: selected, gameId: gameID });
-            setSelected(undefined);
+            console.log(selected);
+            socket.emit("selectPlay", { idx: Array.from(selected), gameId: gameID });
+            setSelected(new Set());
         }
     };
 
@@ -104,17 +117,19 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
             <div className="text-white">
                 <button onClick={take}>Take</button>
             </div>
-
+            {/* <div className="text-white">
+                <button onClick={take}>Take</button>
+            </div> */}
             <div className="grid grid-cols-3 gap-4">
                 {playerDeck.map((card, index) => {
                     return (
-                        <div class="grid place-items-center">
+                        <div key={index} class="grid place-items-center">
                             <CardContainer
                                 card={card}
                                 width={150}
-                                highlighted={selected === index}
+                                highlighted={selected.has(index)}
                                 onClick={() => {
-                                    setSelected(index);
+                                    addToSelected(index);
                                 }}
                             />
                         </div>

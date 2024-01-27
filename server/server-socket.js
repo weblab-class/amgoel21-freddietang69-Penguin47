@@ -120,6 +120,8 @@ module.exports = {
             });
             socket.on("selectPlay", (data) => {
                 const user = getUserFromSocketID(socket.id);
+                console.log("coming");
+                console.log(data.idx);
                 if (user) selectPlay(data.gameId, user, data.idx);
             });
             socket.on("take", (gameId) => {
