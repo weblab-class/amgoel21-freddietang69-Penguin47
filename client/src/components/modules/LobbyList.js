@@ -13,6 +13,7 @@ import { socket } from "../../client-socket.js";
  */
 const LobbyList = (props) => {
     const [lobbies, setLobbies] = useState([]);
+    const [value, setValue] = useState("default");
 
     useEffect(() => {
         get("/api/lobbies", {}).then((data) => {
@@ -41,23 +42,30 @@ const LobbyList = (props) => {
     };
 
     const makeLobby = () => {
-        post("/api/makelobby", { name: "b" }).then((gameId) => {
+        post("/api/makelobby", { name: value }).then((gameId) => {
             window.location = "/game/" + gameId;
         });
     };
 
+    const onChange = (event) => {
+        setValue(event.target.value);
+    };
+
     return (
         <div>
-            <div className="bg-red-500">
+            {/* <div className="bg-red-500">
                 <button className="text-white" onClick={getLobbyList}>
                     What are the lobbies
                 </button>
-            </div>
+            </div> */}
             <div className="bg-red-500">
                 {props.userId ? (
-                    <button className="text-white" onClick={makeLobby}>
-                        Make a Lobby
-                    </button>
+                    <div>
+                        <input placeholder="Lobby Name" onChange={onChange}></input>
+                        <button className="text-white" onClick={makeLobby}>
+                            Create New Lobby
+                        </button>
+                    </div>
                 ) : (
                     "You cannot make a lobby"
                 )}
