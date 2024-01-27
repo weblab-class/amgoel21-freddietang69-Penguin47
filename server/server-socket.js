@@ -19,6 +19,7 @@ const sendGameState = (gameId) => {
                 deck: player.deck.length,
                 tops: player.tops,
                 bottoms: player.bottoms.length,
+                revealed: player.deck.filter((card) => card.revealed),
             };
         }),
         gameState: game.gameState,
@@ -61,7 +62,14 @@ const selectTop = (gameId, user, selected) => {
     }
     sendGameState(gameId);
 };
-
+const pass = (gameId, user, idx) => {
+    gameLogic.pass(gameId, user, idx);
+    sendGameState(gameId);
+};
+const steal = (gameId, user, idx, victim) => {
+    gameLogic.steal(gameId, user, idx, victim);
+    sendGameState(gameId);
+};
 const selectPlay = (gameId, user, idx) => {
     console.log("selectPlay");
     console.log(gameId);
@@ -120,13 +128,20 @@ module.exports = {
             });
             socket.on("selectPlay", (data) => {
                 const user = getUserFromSocketID(socket.id);
-                console.log("coming");
-                console.log(data.idx);
                 if (user) selectPlay(data.gameId, user, data.idx);
+            });
+            socket.on("pass", (data) => {
+                const user = getUserFromSocketID(socket.id);
+                console.log("pass");
+                if (user) pass(data.gameId, user, data.idx);
             });
             socket.on("take", (gameId) => {
                 const user = getUserFromSocketID(socket.id);
                 if (user) take(gameId, user);
+            });
+            socket.on("steal", (data) => {
+                const user = getUserFromSocketID(socket.id);
+                if (user) steal(data.gameId, user, data.idx, data.victim);
             });
         });
     },

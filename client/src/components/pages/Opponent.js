@@ -15,6 +15,11 @@ const Opponent = (props) => {
                 ))}
             </div>
             <div>{props.player.deck} cards in hand </div>
+            <div class="grid grid-cols-3">
+                {props.player.revealed.map((card) => (
+                    <CardContainer card={card} width={75} />
+                ))}
+            </div>
             <div>{props.player.bottoms} cards in bottom</div>
             <div>
                 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------

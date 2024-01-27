@@ -37,7 +37,7 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
     const readyUpPlay = () => {
         if (gameId !== undefined && selected.filter((val) => val).length == 3) {
             locked.current = true;
-            console.log(selected);
+            console.log("top select", selected);
             socket.emit("selectTop", { gameId: gameId, selected: selected });
             socket.emit("readyPlay", gameId);
         }
@@ -74,7 +74,7 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
     );
 };
 
-const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
+const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile }) => {
     const [selected, setSelected] = useState(new Set());
     // Adding a value
     const addToSelected = (newValue) => {
@@ -93,9 +93,9 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
         console.log("attempted select");
         if (selected.size !== 0) {
             console.assert(gameState == "playing");
-            console.log("playing select");
+            console.log("playing select", gameId);
             console.log(selected);
-            socket.emit("selectPlay", { idx: Array.from(selected), gameId: gameID });
+            socket.emit("selectPlay", { idx: Array.from(selected), gameId: gameId });
             setSelected(new Set());
         }
     };
@@ -103,7 +103,24 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
     const take = () => {
         socket.emit("take", gameId);
     };
-
+    const pass = () => {
+        if (selected.size < 2) {
+            if (select.size > 0) {
+                console.log("using three:", Array.from(selected)[0]);
+            }
+            socket.emit("pass", {
+                gameId: gameId,
+                idx: selected.size === 0 ? -1 : Array.from(selected)[0],
+            });
+        }
+        setSelected(new Set());
+    };
+    const steal = (victim) => {
+        if (selected.size === 1) {
+            console.log("attempted steal");
+            socket.emit("steal", { gameId: gameId, idx: Array.from(selected)[0], victim: victim });
+        }
+    };
     return (
         <>
             <div className="text-white">
@@ -111,16 +128,28 @@ const GamePlayScreen = ({ gameID, gameState, players, playerDeck, pile }) => {
             </div>
             <div className="text-white">
                 {players.map((player, index) => {
-                    console.log(players);
-                    return <Opponent key={index} player={player}></Opponent>;
+                    return (
+                        <div>
+                            {player._id !== userId && (
+                                <button
+                                    onClick={() => {
+                                        steal(index);
+                                    }}
+                                >
+                                    Steal
+                                </button>
+                            )}
+                            <Opponent key={index} player={player}></Opponent>
+                        </div>
+                    );
                 })}
             </div>
             <div className="text-white">
                 <button onClick={take}>Take</button>
             </div>
-            {/* <div className="text-white">
-                <button onClick={take}>Take</button>
-            </div> */}
+            <div className="text-white">
+                <button onClick={pass}>Pass</button>
+            </div>
             <div className="grid grid-cols-3 gap-4">
                 {playerDeck.map((card, index) => {
                     return (
@@ -212,6 +241,7 @@ const Game = ({ userId }) => {
                 />
             ) : (
                 <GamePlayScreen
+                    userId={userId}
                     gameId={gameId}
                     gameState={gameState}
                     players={players}

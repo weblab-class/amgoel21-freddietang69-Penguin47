@@ -27,7 +27,7 @@ const makeGame = (name, gameId, creator = "billy bob joe") => {
     idToGameMap[gameId] = game;
 };
 
-// makeGame("test");
+//makeGame("test");
 
 const addPlayerToGame = (gameId, user) => {
     let game = idToGameMap[gameId];
@@ -40,6 +40,7 @@ const addPlayerToGame = (gameId, user) => {
             deck: [],
             tops: [],
             bottoms: [],
+            canPlay: new Set(),
             readyToSelect: false,
             readyToPlay: false,
         });
@@ -113,7 +114,7 @@ const startSelect = (game) => {
     for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
         for (let value = 3; value <= 13; value++) {
             if (value !== 7 && value !== 10) {
-                deck.push({ suit: suit, value: value });
+                deck.push({ suit: suit, value: value, revealed: false });
             }
         }
     }
@@ -131,7 +132,7 @@ const startSelect = (game) => {
     }
     for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
         for (let value of [2, 7, 10, 14]) {
-            deck.push({ suit: suit, value: value });
+            deck.push({ suit: suit, value: value, revealed: false });
         }
     }
     for (let i = deck.length - 1; i >= 0; i--) {
@@ -151,20 +152,26 @@ const startSelect = (game) => {
     game.gameState = "selecting";
 };
 
-const redraw = (game) => {
+const redraw = (game, val) => {
+    const ret = new Set();
     while (game.deck.length > 0 && game.players[0].deck.length < 3) {
+        if (game.deck[game.deck.length - 1].value === val) {
+            ret.add(game.players[0].deck.length);
+        }
         game.players[0].deck.push(game.deck.pop());
     }
     if (game.players[0].deck.length === 0) {
-        if (game.players[0].tops.size > 0) {
+        console.log("got down");
+        if (game.players[0].tops.length > 0) {
             game.players[0].deck = game.players[0].tops;
             game.players[0].tops = [];
-        } else if (game.players[0].bottoms.size > 0) {
+        } else if (game.players[0].bottoms.length > 0) {
             game.players[0].deck.push(game.players[0].bottoms.pop());
         } else {
             //TODO declare winner
         }
     }
+    return ret;
 };
 
 const selectTop = (gameId, user, idx) => {
@@ -188,7 +195,58 @@ const selectTop = (gameId, user, idx) => {
         }
     }
 };
+const pass = (gameId, user, idx) => {
+    const game = idToGameMap[gameId];
+    if (game.gameState !== "playing" || game.players[0]._id !== user._id) {
+        return false;
+    }
+    if (game.players[0].canPlay.size > 1) {
+        game.players[0].canPlay = new Set();
+        game.players.push(game.players.shift());
+    } else if (
+        idx != -1 &&
+        game.players[0].deck[idx].value === 3 &&
+        !game.players[0].deck[idx].revealed
+    ) {
+        game.players[0].deck[idx].revealed = true;
+        game.players.push(game.players.shift());
+    }
+};
+const steal = (gameId, user, idx, victim) => {
+    const game = idToGameMap[gameId];
+    if (
+        game.gameState !== "playing" ||
+        game.players[0]._id !== user._id ||
+        game.players[0].canPlay.size > 1 ||
+        game.players[0].deck[idx].value !== 8
+    ) {
+        return false;
+    }
 
+    let topind = -1;
+    if (game.pile.length > 0) {
+        topind = game.pile.length - 1;
+        while (topind >= 0 && game.pile[topind].value === 7) {
+            topind--;
+        }
+    }
+    console.log("steal");
+    console.log("topind", topind);
+    if (
+        topind === -1 ||
+        (8 >= game.pile[topind].value && game.pile[topind].value !== 9) ||
+        game.pile[topind].value === 9
+    ) {
+        if (true) {
+            let stealidx = getRandomInt(0, game.players[victim].deck.length);
+            let stolenCard = game.players[victim].deck.splice(stealidx, 1)[0];
+            stolenCard.revealed = false;
+            game.players[0].deck.push(stolenCard);
+            game.players[victim].deck.push(game.players[0].deck.splice(idx, 1)[0]);
+            game.players.push(game.players.shift());
+        }
+    }
+};
 const selectPlay = (gameId, user, idx) => {
     console.log("WHAT");
     //must be in selecting mode
@@ -205,7 +263,6 @@ const selectPlay = (gameId, user, idx) => {
 
     // console.log("playing");
     //TODO implement bombing on turn
-    //TODO implement 2,10,7
     const player = game.players[0];
     const val = player.deck[idx[0]].value;
     for (let i of sorted) {
@@ -214,9 +271,17 @@ const selectPlay = (gameId, user, idx) => {
             return;
         }
     }
-    topind = -1;
+    if (player.canPlay.size > 1) {
+        for (let i of sorted) {
+            if (!player.canPlay.has(i)) {
+                console.log("bad val", player.deck[i].value, val);
+                return;
+            }
+        }
+    }
+    let topind = -1;
     if (game.pile.length > 0) {
-        let topind = game.pile.length - 1;
+        topind = game.pile.length - 1;
         while (topind >= 0 && game.pile[topind].value === 7) {
             topind--;
         }
@@ -224,21 +289,19 @@ const selectPlay = (gameId, user, idx) => {
     console.log("to play", val);
     console.log("topind", topind);
     if (
+        player.canPlay.size > 1 ||
         topind === -1 ||
         val === 2 ||
         val == 7 ||
         ((val === 10 || val >= game.pile[topind].value) && game.pile[topind].value !== 9) ||
         (val < game.pile[topind].value && game.pile[topind].value === 9)
     ) {
-        //delete card in hand and put it on top of pile
-        for (let i = sorted.length - 1; i >= 0; i--) {
-            const card = game.players[0].deck.splice(sorted[i], 1)[0];
-            game.pile.push({ value: card.value, suit: card.suit });
-        }
         let bomb = true;
         if (sorted.length + game.pile.length >= 4) {
+            console.log("dup");
             for (let i = 0; i < 4 - sorted.length; i++) {
-                if (game.pile[game.pile.length - i - 1] != val) {
+                if (game.pile[game.pile.length - i - 1].value !== val) {
+                    console.log("fail bomb ", game.pile.length - i - 1);
                     bomb = false;
                     break;
                 }
@@ -246,29 +309,42 @@ const selectPlay = (gameId, user, idx) => {
         } else {
             bomb = false;
         }
+        //delete card in hand and put it on top of pile
+        for (let i = sorted.length - 1; i >= 0; i--) {
+            const card = game.players[0].deck.splice(sorted[i], 1)[0];
+            game.pile.push({ value: card.value, suit: card.suit, revealed: false });
+        }
+
         if (bomb || val === 10) {
+            console.log("bombed");
             game.pile = [];
         }
         //draw
-        console.log("redraw time");
-        redraw(game);
+        const news = redraw(game, val);
+        game.players[0].canPlay = news;
         //TODO implement playing multiple cards logic
         //rotate players
-        if (val !== 2 && val !== 10) {
+        if (val !== 2 && val !== 10 && news.size === 0 && !bomb) {
             game.players.push(game.players.shift());
+        } else {
+            if (val === 2 || val === 10 || bomb) {
+                game.players[0].canPlay = new Set();
+            }
+            //so can't take anymore
+            game.players[0].canPlay.add(-1);
         }
+
         console.log(game.pile);
     }
     //res.send({ 1: "selectPlayDone" });
 };
-
+//TODO: cannot take after playing a card
 const take = (gameId, user) => {
-    console.log("????");
+    console.log("taking");
     //must be in selecting mode
-    //TODO implement bombing out of turn
-    // console.log("try to take");
     const game = idToGameMap[gameId];
     if (
+        game.players[0].canPlay.size > 0 ||
         game.gameState !== "playing" ||
         game.players[0]._id !== user._id ||
         game.pile.length === 0
@@ -290,6 +366,8 @@ module.exports = {
     selectTop,
     selectPlay,
     take,
+    pass,
+    steal,
     readyUpSelect,
     readyUpPlay,
 };
