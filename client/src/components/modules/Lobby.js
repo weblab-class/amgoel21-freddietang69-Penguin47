@@ -20,17 +20,20 @@ const Lobby = (props) => {
         <div className="bg-yellow-500 flex items-stretch">
             <div className="flex-auto">Lobby {props.lobby.name}</div>
             <div className="flex-auto">
-                {" "}
-                Players:{" "}
+                <div>Players</div>
                 {props.lobby.players.map((player, key) => (
                     <div>
                         {key + 1}:{player.name}
                     </div>
-                ))}{" "}
+                ))}
             </div>
-            <button className="flex-auto" onClick={joinLobby}>
-                Click to join
-            </button>
+            {props.userId ? (
+                <button className="flex-auto" onClick={joinLobby}>
+                    Click to join
+                </button>
+            ) : (
+                <div>Can't join until logged in</div>
+            )}
         </div>
     );
 };

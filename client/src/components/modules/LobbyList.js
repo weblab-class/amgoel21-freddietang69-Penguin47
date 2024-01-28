@@ -42,8 +42,8 @@ const LobbyList = (props) => {
     };
 
     const makeLobby = () => {
-        post("/api/makelobby", { name: value }).then((gameId) => {
-            window.location = "/game/" + gameId;
+        post("/api/makelobby", { name: value }).then((data) => {
+            window.location = "/game/" + data.gameId;
         });
     };
 

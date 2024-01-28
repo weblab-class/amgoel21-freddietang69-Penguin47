@@ -49,42 +49,59 @@ router.post("/initsocket", (req, res) => {
 // |------------------------------|
 
 router.get("/lobbies", (req, res) => {
-    Lobby.find({}).then((data) => res.send(data));
+    // Lobby.find({}).then((data) => res.send(data));
+    res.send(
+        Object.values(gameLogic.idToGameMap).map((game) => {
+            return {
+                name: game.name,
+                _id: game._id,
+                players: game.players.map((player) => {
+                    return {
+                        name: player.name,
+                    };
+                }),
+            };
+        })
+    );
 });
 
 router.post("/makelobby", (req, res) => {
-    console.log(req.user);
-    console.log("MAKING");
-    const lobby = new Lobby({
-        name: req.body.name,
-        creator: req.user._id,
-        players: [
-            {
-                _id: req.user._id,
-                name: req.user.name,
-            },
-        ],
-    });
-    Lobby.find({ name: req.body.name }).then((data) => {
-        console.log("hello");
-        console.log(data);
-        if (data.length === 0) {
-            console.log("yay");
-            lobby.save().then((data) => {
-                console.log(data);
-                gameLogic.makeGame(req.body.name, lobby._id);
-                res.send(lobby._id);
-            });
-            //   game.save();
-            socketManager.getIo().emit("lobby", lobby);
-            //    res.send({status: "success", lobby: lobby, game: });
-        } else {
-            //    res.send({status: "success", lobby: lobby});
-        }
-        // else{
-        //  socketManager.getIo().emit("lobby", lobby);
-        //}
-    });
+    const id = Object.keys(gameLogic.idToGameMap).length.toString();
+    gameLogic.makeGame(req.body.name, id);
+    socketManager.getIo().emit("lobby", "made a lobby");
+    res.send({ gameId: id });
+    // console.log(req.user);
+    // console.log("MAKING");
+    // const lobby = new Lobby({
+    //     name: req.body.name,
+    //     creator: req.user._id,
+    //     players: [
+    //         {
+    //             _id: req.user._id,
+    //             name: req.user.name,
+    //         },
+    //     ],
+    // });
+    // Lobby.find({ name: req.body.name }).then((data) => {
+    //     console.log("hello");
+    //     console.log(data);
+    //     if (data.length === 0) {
+    //         console.log("yay");
+    //         lobby.save().then((data) => {
+    //             console.log(data);
+    //             gameLogic.makeGame(req.body.name, lobby._id);
+    //             res.send(lobby._id);
+    //         });
+    //         //   game.save();
+    //         socketManager.getIo().emit("lobby", lobby);
+    //         //    res.send({status: "success", lobby: lobby, game: });
+    //     } else {
+    //         //    res.send({status: "success", lobby: lobby});
+    //     }
+    //     // else{
+    //     //  socketManager.getIo().emit("lobby", lobby);
+    //     //}
+    // });
 });
 
 router.post("/addgameplayer", (req, res) => {
@@ -103,26 +120,28 @@ router.post("/addgameplayer", (req, res) => {
 });
 
 router.post("/addlobbyplayer", (req, res) => {
+    socketManager.getIo().emit("lobby", "hi");
+    res.send({ code: "success" });
     //console.log(req.body.lobby);
     //console.log(req.body.userId);
     //dont create lobby if it exists
     // if (!(await Lobby.find({ _id: req.body.lobby._id }))) {
-    Lobby.updateOne(
-        { _id: req.body.lobby._id },
-        {
-            $set: {
-                players: req.body.lobby.players.concat([
-                    {
-                        _id: req.user._id,
-                        name: req.user.name,
-                    },
-                ]),
-            },
-        }
-    ).then((data) => {
-        socketManager.getIo().emit("lobby", "hi");
-        res.send({ _id: req.body.lobby._id });
-    });
+    // Lobby.updateOne(
+    //     { _id: req.body.lobby._id },
+    //     {
+    //         $set: {
+    //             players: req.body.lobby.players.concat([
+    //                 {
+    //                     _id: req.user._id,
+    //                     name: req.user.name,
+    //                 },
+    //             ]),
+    //         },
+    //     }
+    // ).then((data) => {
+    //     socketManager.getIo().emit("lobby", "hi");
+    //     res.send({ _id: req.body.lobby._id });
+    // });
 });
 
 router.get("/user", auth.ensureLoggedIn, (req, res) => {

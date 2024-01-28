@@ -15,8 +15,8 @@ const Hub = ({ userId, handleLogin, handleLogout }) => {
         <>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
             <LobbyList userId={userId} />
-            <div className="text-white">todo: make lobbies</div>
-            <div className="text-white">yaaaaaaa</div>
+            {/* <div className="text-white">todo: make lobbies</div>
+            <div className="text-white">yaaaaaaa</div> */}
         </>
     );
 };
