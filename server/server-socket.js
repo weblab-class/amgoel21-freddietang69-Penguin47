@@ -1,4 +1,5 @@
 const gameLogic = require("./game-logic");
+const game = require("./models/game");
 
 let io;
 
@@ -10,7 +11,7 @@ const getUserFromSocketID = (socketid) => socketToUserMap[socketid];
 const getSocketFromSocketID = (socketid) => io.sockets.connected[socketid];
 
 const sendGameState = (gameId) => {
-    game = gameLogic.idToGameMap[gameId];
+    let game = gameLogic.idToGameMap[gameId];
     to_send = {
         players: game.players.map((player) => {
             return {
@@ -22,6 +23,7 @@ const sendGameState = (gameId) => {
                 revealed: player.deck.filter((card) => card.revealed),
             };
         }),
+        turn: game.turn,
         gameState: game.gameState,
         deck: game.deck.length,
         pile: game.pile,
@@ -67,7 +69,16 @@ const pass = (gameId, user, idx) => {
     sendGameState(gameId);
 };
 const steal = (gameId, user, idx, victim) => {
-    gameLogic.steal(gameId, user, idx, victim);
+    const vict = gameLogic.steal(gameId, user, idx, victim);
+    sendGameState(gameId);
+
+    if (vict !== -1) {
+        const game = gameLogic.idToGameMap[gameId];
+        getSocketFromUserID(game.players[vict]._id).emit("block", { stealer: game.turn });
+    }
+};
+const block = (gameId, user, response) => {
+    gameLogic.block(gameId, user, response);
     sendGameState(gameId);
 };
 const selectPlay = (gameId, user, idx) => {
@@ -142,6 +153,10 @@ module.exports = {
             socket.on("steal", (data) => {
                 const user = getUserFromSocketID(socket.id);
                 if (user) steal(data.gameId, user, data.idx, data.victim);
+            });
+            socket.on("block", (data) => {
+                const user = getUserFromSocketID(socket.id);
+                if (user) block(data.gameId, user, data.response);
             });
         });
     },

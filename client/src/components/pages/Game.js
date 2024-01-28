@@ -74,7 +74,7 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
     );
 };
 
-const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile }) => {
+const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, turn }) => {
     const [selected, setSelected] = useState(new Set());
     // Adding a value
     const addToSelected = (newValue) => {
@@ -124,7 +124,7 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile }
     return (
         <div className="relative">
             <div className="text-white absolute left-0 up-0 w-1/2">
-                <Opponents players={players.filter((player) => player._id !== userId)} />
+                <Opponents steal={steal} players={players} turn={turn} userId={userId} />
                 {/* // {players.map((player, index) => {
                 //     return (
                 //         <div>
@@ -193,7 +193,8 @@ const Game = ({ userId }) => {
     const [players, setPlayers] = useState([]);
     const [pile, setPile] = useState([]);
     const [gameState, setgameState] = useState("waiting");
-
+    const [turn, setTurn] = useState(0);
+    const [block, setBlock] = useState(-1);
     useEffect(() => {
         if (userId) {
             console.log(userId, gameId);
@@ -212,7 +213,16 @@ const Game = ({ userId }) => {
             });
         };
     }, []);
-
+    useEffect(() => {
+        socket.on("block", (info) => {
+            setBlock(info.stealer);
+        });
+        return () => {
+            socket.off("block", (info) => {
+                setBlock(info.stealer);
+            });
+        };
+    }, []);
     const processUpdate = (update) => {
         setReadySelect(update.readySelect);
         setReadyPlay(update.readyPlay);
@@ -223,8 +233,12 @@ const Game = ({ userId }) => {
         setPlayers(update.players);
         setDeck(update.deck);
         setPile(update.pile);
+        setTurn(update.turn);
     };
-
+    const respond = (response) => {
+        socket.emit("block", { gameId: gameId, response: response });
+        setBlock(-1);
+    };
     return (
         <>
             {!userId ? (
@@ -238,7 +252,7 @@ const Game = ({ userId }) => {
                     players={players}
                     playerDeck={playerDeck}
                 />
-            ) : (
+            ) : block === -1 ? (
                 <GamePlayScreen
                     userId={userId}
                     gameId={gameId}
@@ -246,7 +260,25 @@ const Game = ({ userId }) => {
                     players={players}
                     playerDeck={playerDeck}
                     pile={pile}
+                    turn={turn}
                 />
+            ) : (
+                <div className="text-white">
+                    <button
+                        onClick={() => {
+                            respond(true);
+                        }}
+                    >
+                        Block
+                    </button>
+                    <button
+                        onClick={() => {
+                            respond(false);
+                        }}
+                    >
+                        No Block
+                    </button>
+                </div>
             )}
         </>
     );

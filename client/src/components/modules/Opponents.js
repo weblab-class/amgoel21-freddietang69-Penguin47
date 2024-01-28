@@ -2,7 +2,7 @@ import React from "react";
 
 import CardContainer from "./CardContainer";
 
-const Opponents = ({ players }) => {
+const Opponents = ({ players, turn, userId, steal }) => {
     return (
         <div>
             {players.map((player, index) => {
@@ -11,9 +11,24 @@ const Opponents = ({ players }) => {
                         <div>
                             ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                         </div>
-                        <div>
-                            Opponent {index + 1}: {player.name}
-                        </div>
+                        {player._id === userId ? (
+                            <div>YOU</div>
+                        ) : (
+                            <div>
+                                <div>
+                                    Opponent {index + 1}: {player.name}
+                                </div>
+                                <button
+                                    className="u-bold"
+                                    onClick={() => {
+                                        steal(index);
+                                    }}
+                                >
+                                    Steal
+                                </button>
+                            </div>
+                        )}
+                        {index === turn && <div className="text-yellow-500">TO PLAY</div>}
                         <div class="grid grid-cols-3">
                             {player.tops.map((card) => (
                                 <CardContainer card={card} width={75} />

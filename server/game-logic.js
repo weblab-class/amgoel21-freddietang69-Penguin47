@@ -23,6 +23,9 @@ const makeGame = (name, gameId, creator = "billy bob joe") => {
         gameState: "waiting",
         deck: [],
         pile: [],
+        turn: 0,
+        waiting: -1,
+        idx: 0, //for removal in declined block
     };
     idToGameMap[gameId] = game;
 };
@@ -112,7 +115,7 @@ const startGame = (game) => {
 const startSelect = (game) => {
     const deck = [];
     for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
-        for (let value = 3; value <= 13; value++) {
+        for (let value = 5; value <= 9; value++) {
             if (value !== 7 && value !== 10) {
                 deck.push({ suit: suit, value: value, revealed: false });
             }
@@ -153,20 +156,21 @@ const startSelect = (game) => {
 };
 
 const redraw = (game, val) => {
+    const turn = game.turn;
     const ret = new Set();
-    while (game.deck.length > 0 && game.players[0].deck.length < 3) {
+    while (game.deck.length > 0 && game.players[turn].deck.length < 3) {
         if (game.deck[game.deck.length - 1].value === val) {
-            ret.add(game.players[0].deck.length);
+            ret.add(game.players[turn].deck.length);
         }
-        game.players[0].deck.push(game.deck.pop());
+        game.players[turn].deck.push(game.deck.pop());
     }
-    if (game.players[0].deck.length === 0) {
+    if (game.players[turn].deck.length === 0) {
         console.log("got down");
-        if (game.players[0].tops.length > 0) {
-            game.players[0].deck = game.players[0].tops;
-            game.players[0].tops = [];
-        } else if (game.players[0].bottoms.length > 0) {
-            game.players[0].deck.push(game.players[0].bottoms.pop());
+        if (game.players[turn].tops.length > 0) {
+            game.players[turn].deck = game.players[turn].tops;
+            game.players[turn].tops = [];
+        } else if (game.players[turn].bottoms.length > 0) {
+            game.players[turn].deck.push(game.players[turn].bottoms.pop());
         } else {
             //TODO declare winner
         }
@@ -197,28 +201,52 @@ const selectTop = (gameId, user, idx) => {
 };
 const pass = (gameId, user, idx) => {
     const game = idToGameMap[gameId];
-    if (game.gameState !== "playing" || game.players[0]._id !== user._id) {
+    if (
+        game.waiting !== -1 ||
+        game.gameState !== "playing" ||
+        game.players[game.turn]._id !== user._id
+    ) {
         return false;
     }
-    if (game.players[0].canPlay.size > 1) {
-        game.players[0].canPlay = new Set();
-        game.players.push(game.players.shift());
+    if (game.players[game.turn].canPlay.size > 1) {
+        game.players[game.turn].canPlay = new Set();
+        game.turn = (game.turn + 1) % game.players.length;
+        // game.players.push(game.players.shift());
     } else if (
         idx != -1 &&
-        game.players[0].deck[idx].value === 3 &&
-        !game.players[0].deck[idx].revealed
+        game.players[game.turn].deck[idx].value === 3 &&
+        !game.players[game.turn].deck[idx].revealed
     ) {
-        game.players[0].deck[idx].revealed = true;
-        game.players.push(game.players.shift());
+        game.players[game.turn].deck[idx].revealed = true;
+        game.turn = (game.turn + 1) % game.players.length;
+        //     game.players.push(game.players.shift());
     }
+};
+const block = (gameId, user, response) => {
+    const game = idToGameMap[gameId];
+    if (game.waiting === -1 || game.players[game.waiting]._id !== user._id) {
+        return false;
+    }
+    //did not block
+    if (!response) {
+        const victim = game.waiting;
+        let stealidx = getRandomInt(0, game.players[victim].deck.length);
+        let stolenCard = game.players[victim].deck.splice(stealidx, 1)[0];
+        stolenCard.revealed = false;
+        game.players[game.turn].deck.push(stolenCard);
+        game.players[victim].deck.push(game.players[game.turn].deck.splice(game.idx, 1)[0]);
+    }
+    game.waiting = -1;
+    game.turn = (game.turn + 1) % game.players.length;
 };
 const steal = (gameId, user, idx, victim) => {
     const game = idToGameMap[gameId];
     if (
+        game.waiting !== -1 ||
         game.gameState !== "playing" ||
-        game.players[0]._id !== user._id ||
-        game.players[0].canPlay.size > 1 ||
-        game.players[0].deck[idx].value !== 8
+        game.players[game.turn]._id !== user._id ||
+        game.players[game.turn].canPlay.size > 1 ||
+        game.players[game.turn].deck[idx].value !== 8
     ) {
         return false;
     }
@@ -237,14 +265,23 @@ const steal = (gameId, user, idx, victim) => {
         (8 >= game.pile[topind].value && game.pile[topind].value !== 9) ||
         game.pile[topind].value === 9
     ) {
-        if (true) {
+        if (game.players[victim].deck.filter((card) => card.value === 8).length == 0) {
             let stealidx = getRandomInt(0, game.players[victim].deck.length);
             let stolenCard = game.players[victim].deck.splice(stealidx, 1)[0];
             stolenCard.revealed = false;
-            game.players[0].deck.push(stolenCard);
-            game.players[victim].deck.push(game.players[0].deck.splice(idx, 1)[0]);
-            game.players.push(game.players.shift());
+            game.players[game.turn].deck.push(stolenCard);
+            game.players[victim].deck.push(game.players[game.turn].deck.splice(idx, 1)[0]);
+            game.turn = (game.turn + 1) % game.players.length;
+            //  game.players.push(game.players.shift());
+            return -1;
+        } else {
+            console.log("waiting on", victim);
+            game.waiting = victim;
+            game.idx = idx;
+            return victim;
         }
+    } else {
+        return -1;
     }
 };
 const selectPlay = (gameId, user, idx) => {
@@ -257,13 +294,17 @@ const selectPlay = (gameId, user, idx) => {
     const game = idToGameMap[gameId];
     const sorted = idx.sort((a, b) => a - b);
     console.log(sorted);
-    if (game.gameState !== "playing" || game.players[0]._id !== user._id) {
+    if (
+        game.waiting !== -1 ||
+        game.gameState !== "playing" ||
+        game.players[game.turn]._id !== user._id
+    ) {
         return false;
     }
 
     // console.log("playing");
     //TODO implement bombing on turn
-    const player = game.players[0];
+    const player = game.players[game.turn];
     const val = player.deck[idx[0]].value;
     for (let i of sorted) {
         if (player.deck[i].value !== val) {
@@ -311,7 +352,7 @@ const selectPlay = (gameId, user, idx) => {
         }
         //delete card in hand and put it on top of pile
         for (let i = sorted.length - 1; i >= 0; i--) {
-            const card = game.players[0].deck.splice(sorted[i], 1)[0];
+            const card = game.players[game.turn].deck.splice(sorted[i], 1)[0];
             game.pile.push({ value: card.value, suit: card.suit, revealed: false });
         }
 
@@ -321,17 +362,18 @@ const selectPlay = (gameId, user, idx) => {
         }
         //draw
         const news = redraw(game, val);
-        game.players[0].canPlay = news;
+        game.players[game.turn].canPlay = news;
         //TODO implement playing multiple cards logic
         //rotate players
         if (val !== 2 && val !== 10 && news.size === 0 && !bomb) {
-            game.players.push(game.players.shift());
+            game.turn = (game.turn + 1) % game.players.length;
+            //  game.players.push(game.players.shift());
         } else {
             if (val === 2 || val === 10 || bomb) {
-                game.players[0].canPlay = new Set();
+                game.players[game.turn].canPlay = new Set();
             }
             //so can't take anymore
-            game.players[0].canPlay.add(-1);
+            game.players[game.turn].canPlay.add(-1);
         }
 
         console.log(game.pile);
@@ -344,17 +386,19 @@ const take = (gameId, user) => {
     //must be in selecting mode
     const game = idToGameMap[gameId];
     if (
-        game.players[0].canPlay.size > 0 ||
+        game.waiting !== -1 ||
+        game.players[game.turn].canPlay.size > 0 ||
         game.gameState !== "playing" ||
-        game.players[0]._id !== user._id ||
+        game.players[game.turn]._id !== user._id ||
         game.pile.length === 0
     ) {
         return false;
     } else {
-        game.players[0].deck.push(...game.pile);
+        game.players[game.turn].deck.push(...game.pile);
         game.pile = [];
         //rotate players
-        game.players.push(game.players.shift());
+        game.turn = (game.turn + 1) % game.players.length;
+        //  game.players.push(game.players.shift());
         // console.log(game.pile);
     }
 };
@@ -368,6 +412,7 @@ module.exports = {
     take,
     pass,
     steal,
+    block,
     readyUpSelect,
     readyUpPlay,
 };
