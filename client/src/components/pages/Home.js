@@ -12,7 +12,7 @@ const Home = ({ userId, handleLogin, handleLogout }) => {
                 Let's Play Palace
             </h1>
             <div className="flex justify-center items-center">
-                <img src={logo} />
+                <img src={logo} class="w-2/3" />
             </div>
             <h1 class="mb-4 text-xl flex justify-center font-mono leading-none tracking-tight text-neutral-50 md:text-2xl lg:text-3xl dark:text-white">
                 Come out on top in this fast-paced card game!

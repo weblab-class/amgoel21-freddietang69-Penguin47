@@ -6,9 +6,10 @@
 } */
 
 .NavBar-link {
-    padding: var(--s) var(--m);
+    /* padding: var(--s) var(--m); */
     color: gray;
     text-decoration: none;
+    font-size: 30px;
 }
 
 .NavBar-container {
