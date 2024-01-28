@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { socket } from "../../client-socket.js";
 import { post } from "../../utilities";
-import Opponent from "./Opponent.js";
+import Opponents from "../modules/Opponents.js";
 import "../../utilities.css";
 import "./Game.css";
 
@@ -127,22 +127,23 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile }
                 <button onClick={select}>Select</button>
             </div>
             <div className="text-white">
-                {players.map((player, index) => {
-                    return (
-                        <div>
-                            {player._id !== userId && (
-                                <button
-                                    onClick={() => {
-                                        steal(index);
-                                    }}
-                                >
-                                    Steal
-                                </button>
-                            )}
-                            <Opponent key={index} player={player}></Opponent>
-                        </div>
-                    );
-                })}
+                <Opponents players={players.filter((player) => player._id !== userId)} />
+                {/* // {players.map((player, index) => {
+                //     return (
+                //         <div>
+                //             {player._id !== userId && (
+                //                 <button
+                //                     onClick={() => {
+                //                         steal(index);
+                //                     }}
+                //                 >
+                //                     Steal
+                //                 </button>
+                //             )}
+                //             <Opponent key={index} player={player}></Opponent>
+                //         </div>
+                //     );
+                // })} */}
             </div>
             <div className="text-white">
                 <button onClick={take}>Take</button>

@@ -23,7 +23,7 @@ const Lobby = (props) => {
                 <div>Players</div>
                 {props.lobby.players.map((player, key) => (
                     <div>
-                        {key + 1}:{player.name}
+                        {key + 1}: {player.name}
                     </div>
                 ))}
             </div>
