@@ -122,11 +122,8 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile }
         }
     };
     return (
-        <>
-            <div className="text-white">
-                <button onClick={select}>Select</button>
-            </div>
-            <div className="text-white">
+        <div className="relative">
+            <div className="text-white absolute left-0 up-0 w-1/2">
                 <Opponents players={players.filter((player) => player._id !== userId)} />
                 {/* // {players.map((player, index) => {
                 //     return (
@@ -145,41 +142,42 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile }
                 //     );
                 // })} */}
             </div>
-            <div className="text-white">
-                <button onClick={take}>Take</button>
-            </div>
-            <div className="text-white">
-                <button onClick={pass}>Pass</button>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-                {playerDeck.map((card, index) => {
-                    return (
-                        <div key={index} class="grid place-items-center">
-                            <CardContainer
-                                card={card}
-                                width={150}
-                                highlighted={selected.has(index)}
-                                onClick={() => {
-                                    addToSelected(index);
-                                }}
-                            />
-                        </div>
-                    );
-                })}
-            </div>
+            <div className="text-white absolute left-1/2 up-0 w-1/2">
+                <div className="up-0 h-1/6 flex justify-center items-center gap-8">
+                    <button onClick={select}>Select</button>
+                    <button onClick={take}>Take</button>
+                    <button onClick={pass}>Pass</button>
+                </div>
 
-            <div className="text-white">
-                <h3>Pile</h3>
-                {pile.map((card, index) => {
-                    return (
-                        <div key={index} className="text-white">
-                            ({card.value} of {card.suit})
-                        </div>
-                    );
-                })}
+                <div className="up-1/6 w-full grid grid-cols-3 gap-4">
+                    {playerDeck.map((card, index) => {
+                        return (
+                            <div key={index} class="grid place-items-center">
+                                <CardContainer
+                                    card={card}
+                                    width={150}
+                                    highlighted={selected.has(index)}
+                                    onClick={() => {
+                                        addToSelected(index);
+                                    }}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="text-white">
+                    <h3>Pile</h3>
+                    {pile.map((card, index) => {
+                        return (
+                            <div key={index} className="text-white">
+                                ({card.value} of {card.suit})
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-            <div className="text-white"></div>
-        </>
+        </div>
     );
 };
 
