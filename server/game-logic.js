@@ -13,7 +13,7 @@ const getRandomInt = (min, max) => {
 
 idToGameMap = {};
 
-const makeGame = (name, gameId, creator = "billy bob joe") => {
+const makeGame = (name, gameId, creator = {name: "default", id: "default"}) => {
     //console.log(Object.keys(idToGameMap).length);
     let game = {
         name: name,

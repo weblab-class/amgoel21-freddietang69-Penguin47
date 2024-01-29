@@ -35,12 +35,6 @@ const LobbyList = (props) => {
         };
     }, []);
 
-    const getLobbyList = () => {
-        get("/api/lobbies", {}).then((data) => {
-            console.log(data);
-        });
-    };
-
     const makeLobby = () => {
         post("/api/makelobby", { name: value }).then((data) => {
             window.location = "/game/" + data.gameId;
@@ -52,12 +46,7 @@ const LobbyList = (props) => {
     };
 
     return (
-        <div>
-            {/* <div className="bg-red-500">
-                <button className="text-white" onClick={getLobbyList}>
-                    What are the lobbies
-                </button>
-            </div> */}
+        <div className="mx-[20%] my-16 bg-gray-300 px-8 pb-8">
             <div className="bg-red-500">
                 {props.userId ? (
                     <div>
@@ -70,11 +59,11 @@ const LobbyList = (props) => {
                     "You cannot make a lobby"
                 )}
             </div>
-            {/* <Lobby lobby={{ name: "test 1" }} />
-      <Lobby lobby={{ name: "test 2" }} /> */}
-            {lobbies.map((lobby) => {
-                return <Lobby userId={props.userId} lobby={lobby} key={lobby._id}></Lobby>;
-            })}
+            <div className="grid grid-cols-2 gap-8">
+                {lobbies.map((lobby) => {
+                    return <Lobby userId={props.userId} lobby={lobby} key={lobby._id}></Lobby>;
+                })}
+            </div>
         </div>
     );
 };

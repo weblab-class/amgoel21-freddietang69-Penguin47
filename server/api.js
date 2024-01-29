@@ -60,6 +60,7 @@ router.get("/lobbies", (req, res) => {
                         name: player.name,
                     };
                 }),
+                creator: game.creator,
             };
         })
     );
@@ -67,7 +68,7 @@ router.get("/lobbies", (req, res) => {
 
 router.post("/makelobby", (req, res) => {
     const id = Object.keys(gameLogic.idToGameMap).length.toString();
-    gameLogic.makeGame(req.body.name, id);
+    gameLogic.makeGame(req.body.name, id, req.user);
     socketManager.getIo().emit("lobby", "made a lobby");
     res.send({ gameId: id });
     // console.log(req.user);
