@@ -16,11 +16,11 @@ const CardContainer = ({ card, width = 150, onClick = () => {}, highlighted = fa
     return (
         <>
             {highlighted ? (
-                <div onClick={onClick} class="p-1 bg-yellow-300">
+                <div onClick={onClick} className="p-1 bg-yellow-300 flex justify-center">
                     <img src={image.default} width={width} />
                 </div>
             ) : (
-                <div onClick={onClick}>
+                <div onClick={onClick} className="flex justify-center">
                     <img src={image.default} width={width} />
                 </div>
             )}

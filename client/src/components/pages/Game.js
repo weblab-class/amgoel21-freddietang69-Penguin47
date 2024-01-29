@@ -45,31 +45,39 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
 
     return (
         <>
-            <div className="text-white">
-                <button onClick={readyUpPlay}>Ready?</button>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-                {playerDeck.map((card, index) => {
-                    return (
-                        <div class="grid place-items-center">
-                            <CardContainer
-                                card={card}
-                                width={150}
-                                highlighted={!locked.current && selected[index]}
-                                onClick={() => {
-                                    if (!locked.current) {
-                                        const newSelected = [...selected];
-                                        newSelected[index] = !selected[index];
-                                        setSelected(newSelected);
-                                        // console.log(index);
-                                        // console.log(selected);
-                                    }
-                                }}
-                            />
-                        </div>
-                    );
-                })}
-            </div>
+            {!locked.current ? (
+                <>
+                    <div className="text-white flex justify-center">
+                        <button onClick={readyUpPlay} className="">
+                            Ready?
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                        {playerDeck.map((card, index) => {
+                            return (
+                                <div class="grid place-items-center">
+                                    <CardContainer
+                                        card={card}
+                                        width={150}
+                                        highlighted={!locked.current && selected[index]}
+                                        onClick={() => {
+                                            if (!locked.current) {
+                                                const newSelected = [...selected];
+                                                newSelected[index] = !selected[index];
+                                                setSelected(newSelected);
+                                                // console.log(index);
+                                                // console.log(selected);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
+            ) : (
+                <div className="text-white">Waiting for other players to lock in</div>
+            )}
         </>
     );
 };
@@ -103,6 +111,7 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
     const take = () => {
         socket.emit("take", gameId);
     };
+
     const pass = () => {
         if (selected.size < 2) {
             if (select.size > 0) {
@@ -115,41 +124,27 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
         }
         setSelected(new Set());
     };
+
     const steal = (victim) => {
         if (selected.size === 1) {
             console.log("attempted steal");
             socket.emit("steal", { gameId: gameId, idx: Array.from(selected)[0], victim: victim });
         }
     };
+
     return (
         <div className="relative">
             <div className="text-white absolute left-0 up-0 w-1/2">
                 <Opponents steal={steal} players={players} turn={turn} userId={userId} />
-                {/* // {players.map((player, index) => {
-                //     return (
-                //         <div>
-                //             {player._id !== userId && (
-                //                 <button
-                //                     onClick={() => {
-                //                         steal(index);
-                //                     }}
-                //                 >
-                //                     Steal
-                //                 </button>
-                //             )}
-                //             <Opponent key={index} player={player}></Opponent>
-                //         </div>
-                //     );
-                // })} */}
             </div>
             <div className="text-white absolute left-1/2 up-0 w-1/2">
-                <div className="up-0 h-1/6 flex justify-center items-center gap-8">
+                <div className="up-0 flex justify-center gap-8 my-8">
                     <button onClick={select}>Select</button>
                     <button onClick={take}>Take</button>
                     <button onClick={pass}>Pass</button>
                 </div>
 
-                <div className="up-1/6 w-full grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-4 my-16">
                     {playerDeck.map((card, index) => {
                         return (
                             <div key={index} class="grid place-items-center">
@@ -167,14 +162,12 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
                 </div>
 
                 <div className="text-white">
-                    <h3>Pile</h3>
-                    {pile.map((card, index) => {
-                        return (
-                            <div key={index} className="text-white">
-                                ({card.value} of {card.suit})
-                            </div>
-                        );
-                    })}
+                    <h1 className="flex justify-center my-4">Pile</h1>
+                    <div className="grid grid-cols-7 gap-3 mx-4">
+                        {pile.map((card, index) => {
+                            return <CardContainer card={card} width={100} />;
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,7 +175,6 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
 };
 
 const Game = ({ userId }) => {
-    // const [gameId, setgameId] = useState(undefined);
     const gameId = useParams().gameId;
     const [readySelect, setReadySelect] = useState(false);
     const [readyPlay, setReadyPlay] = useState(false);
@@ -195,6 +187,7 @@ const Game = ({ userId }) => {
     const [gameState, setgameState] = useState("waiting");
     const [turn, setTurn] = useState(0);
     const [block, setBlock] = useState(-1);
+
     useEffect(() => {
         if (userId) {
             console.log(userId, gameId);
@@ -213,6 +206,7 @@ const Game = ({ userId }) => {
             });
         };
     }, []);
+
     useEffect(() => {
         socket.on("block", (info) => {
             setBlock(info.stealer);
@@ -223,6 +217,7 @@ const Game = ({ userId }) => {
             });
         };
     }, []);
+
     const processUpdate = (update) => {
         setReadySelect(update.readySelect);
         setReadyPlay(update.readyPlay);
@@ -235,10 +230,12 @@ const Game = ({ userId }) => {
         setPile(update.pile);
         setTurn(update.turn);
     };
+
     const respond = (response) => {
         socket.emit("block", { gameId: gameId, response: response });
         setBlock(-1);
     };
+
     return (
         <>
             {!userId ? (

@@ -7,44 +7,41 @@ const Opponents = ({ players, turn, userId, steal }) => {
         <div>
             {players.map((player, index) => {
                 return (
-                    <span className="text-white">
-                        <div>
-                            ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                        </div>
+                    <div className="text-white m-5 border-2 border-dotted border-green-500 bg-gray-600 p-3">
                         {player._id === userId ? (
-                            <div>YOU</div>
+                            <div className="flex justify-center"> YOU </div>
                         ) : (
                             <div>
-                                <div>
-                                    Opponent {index + 1}: {player.name}
+                                <div className="flex justify-center">{player.name}</div>
+                                <div className="flex justify-center">
+                                    <button
+                                        className="u-bold flex justify-center"
+                                        onClick={() => {
+                                            steal(index);
+                                        }}
+                                    >
+                                        Steal
+                                    </button>
                                 </div>
-                                <button
-                                    className="u-bold"
-                                    onClick={() => {
-                                        steal(index);
-                                    }}
-                                >
-                                    Steal
-                                </button>
                             </div>
                         )}
-                        {index === turn && <div className="text-yellow-500">TO PLAY</div>}
-                        <div class="grid grid-cols-3">
+                        {index === turn && (
+                            <div className="text-yellow-500 flex justify-center">TO PLAY</div>
+                        )}
+                        <div className="flex justify-center">Top cards</div>
+                        <div className="grid grid-cols-3 my-3">
                             {player.tops.map((card) => (
                                 <CardContainer card={card} width={75} />
                             ))}
                         </div>
-                        <div>{player.deck} cards in hand </div>
-                        <div class="grid grid-cols-3">
+                        <div className="flex justify-center">{player.deck} cards in hand </div>
+                        <div className="grid grid-cols-3 my-3">
                             {player.revealed.map((card) => (
                                 <CardContainer card={card} width={75} />
                             ))}
                         </div>
-                        <div>{player.bottoms} cards in bottom</div>
-                        <div>
-                            -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                        </div>
-                    </span>
+                        <div className="flex justify-center">{player.bottoms} cards in bottom</div>
+                    </div>
                 );
             })}
         </div>
