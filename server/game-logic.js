@@ -239,6 +239,29 @@ const block = (gameId, user, response) => {
     game.waiting = -1;
     game.turn = (game.turn + 1) % game.players.length;
 };
+const swap = (gameId, user, cards) => {
+    const game = idToGameMap[gameId];
+    let useridx = -1;
+    for (let i = 0; i < game.players.length; i++) {
+        if (game.players[i]._id === user._id) {
+            useridx = i;
+            break;
+        }
+    }
+    if (
+        useridx === -1 ||
+        game.waiting !== -1 ||
+        game.gameState !== "playing" ||
+        game.players[game.turn].canPlay.size > 1
+    ) {
+        console.log("swap fail");
+        return false;
+    }
+    [game.players[useridx].deck[cards[0]], game.players[useridx].deck[cards[1]]] = [
+        game.players[useridx].deck[cards[1]],
+        game.players[useridx].deck[cards[0]],
+    ];
+};
 const steal = (gameId, user, idx, victim) => {
     const game = idToGameMap[gameId];
     if (
@@ -413,6 +436,7 @@ module.exports = {
     pass,
     steal,
     block,
+    swap,
     readyUpSelect,
     readyUpPlay,
 };

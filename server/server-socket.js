@@ -77,6 +77,10 @@ const steal = (gameId, user, idx, victim) => {
         getSocketFromUserID(game.players[vict]._id).emit("block", { stealer: game.turn });
     }
 };
+const swap = (gameId, user, cards) => {
+    gameLogic.swap(gameId, user, cards);
+    sendGameState(gameId);
+};
 const block = (gameId, user, response) => {
     gameLogic.block(gameId, user, response);
     sendGameState(gameId);
@@ -157,6 +161,10 @@ module.exports = {
             socket.on("block", (data) => {
                 const user = getUserFromSocketID(socket.id);
                 if (user) block(data.gameId, user, data.response);
+            });
+            socket.on("swap", (data) => {
+                const user = getUserFromSocketID(socket.id);
+                if (user) swap(data.gameId, user, data.cards);
             });
         });
     },

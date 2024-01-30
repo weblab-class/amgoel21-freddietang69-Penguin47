@@ -131,7 +131,17 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
             socket.emit("steal", { gameId: gameId, idx: Array.from(selected)[0], victim: victim });
         }
     };
-
+    const swap = () => {
+        if (selected.size === 2) {
+            if (select.size > 0) {
+                console.log("using three:", Array.from(selected)[0]);
+            }
+            socket.emit("swap", {
+                gameId: gameId,
+                cards: Array.from(selected),
+            });
+        }
+    };
     return (
         <div className="relative">
             <div className="text-white absolute left-0 up-0 w-1/2">
@@ -142,6 +152,7 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
                     <button onClick={select}>Select</button>
                     <button onClick={take}>Take</button>
                     <button onClick={pass}>Pass</button>
+                    <button onClick={swap}>Swap Cards</button>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 my-16">
