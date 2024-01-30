@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Lobby from "./Lobby.js";
 import { get, post } from "../../utilities.js";
@@ -14,6 +15,7 @@ import { socket } from "../../client-socket.js";
 const LobbyList = (props) => {
     const [lobbies, setLobbies] = useState([]);
     const [value, setValue] = useState("default");
+    const navigate = useNavigate();
 
     useEffect(() => {
         get("/api/lobbies", {}).then((data) => {
@@ -37,7 +39,7 @@ const LobbyList = (props) => {
 
     const makeLobby = () => {
         post("/api/makelobby", { name: value }).then((data) => {
-            window.location = "/game/" + data.gameId;
+            navigate("/game/" + data.gameId);
         });
     };
 

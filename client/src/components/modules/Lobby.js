@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { get, post } from "../../utilities.js";
 
@@ -11,9 +12,10 @@ import { get, post } from "../../utilities.js";
  * @param {lobby object} lobby of the lobby
  */
 const Lobby = ({ userId, lobby }) => {
+    const navigate = useNavigate();
     const joinLobby = () => {
-        post("/api/addlobbyplayer", { lobby: props.lobby }).then((data) => {
-            window.location = "/game/" + props.lobby._id;
+        post("/api/addlobbyplayer", { lobby: lobby }).then((data) => {
+            navigate("/game/" + lobby._id);
         });
     };
 
