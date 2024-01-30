@@ -1,9 +1,49 @@
 .Game-winner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 40px;
-  background-color: #333333;
-  color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 40px;
+    background-color: #333333;
+    color: white;
+}
+
+.steal-button {
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.steal-button:hover {
+    filter: brightness(90%);
+}
+
+.block {
+    border: 2px solid green;
+    background-color: white;
+    color: green;
+}
+
+.no-block {
+    border: 2px solid red;
+    background-color: white;
+    color: red;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Add this to center items vertically */
+}
+
+.button-container button {
+    margin-right: 10px;
+}
+
+.steal-confirmation-page {
+    text-align: center;
 }

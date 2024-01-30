@@ -13,7 +13,7 @@ const getRandomInt = (min, max) => {
 
 idToGameMap = {};
 
-const makeGame = (name, gameId, creator = {name: "default", id: "default"}) => {
+const makeGame = (name, gameId, creator = { name: "default", id: "default" }) => {
     //console.log(Object.keys(idToGameMap).length);
     let game = {
         name: name,
@@ -115,7 +115,7 @@ const startGame = (game) => {
 const startSelect = (game) => {
     const deck = [];
     for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
-        for (let value = 5; value <= 9; value++) {
+        for (let value = 5; value <= 8; value++) {
             if (value !== 7 && value !== 10) {
                 deck.push({ suit: suit, value: value, revealed: false });
             }

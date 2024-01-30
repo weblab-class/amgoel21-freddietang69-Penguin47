@@ -260,21 +260,26 @@ const Game = ({ userId }) => {
                     turn={turn}
                 />
             ) : (
-                <div className="text-white">
-                    <button
-                        onClick={() => {
-                            respond(true);
-                        }}
-                    >
-                        Block
-                    </button>
-                    <button
-                        onClick={() => {
-                            respond(false);
-                        }}
-                    >
-                        No Block
-                    </button>
+                <div className="text-white steal-confirmation-page">
+                    <h1>{players[block].name} is trying to steal from you!</h1>
+                    <div className="button-container">
+                        <button
+                            className="steal-button block"
+                            onClick={() => {
+                                respond(true);
+                            }}
+                        >
+                            Block
+                        </button>
+                        <button
+                            className="steal-button no-block"
+                            onClick={() => {
+                                respond(false);
+                            }}
+                        >
+                            Don't Block
+                        </button>
+                    </div>
                 </div>
             )}
         </>
