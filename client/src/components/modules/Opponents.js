@@ -2,6 +2,7 @@ import React from "react";
 
 import CardContainer from "./CardContainer";
 
+import "../pages/Game.css";
 const Opponents = ({ players, turn, userId, steal, deck }) => {
     return (
         <div>
@@ -15,7 +16,7 @@ const Opponents = ({ players, turn, userId, steal, deck }) => {
                                 <div className="flex justify-center">{player.name}</div>
                                 <div className="flex justify-center">
                                     <button
-                                        className="u-bold flex justify-center"
+                                        className="u-bold flex justify-center steal-button"
                                         onClick={() => {
                                             steal(index);
                                         }}

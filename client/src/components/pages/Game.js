@@ -48,7 +48,7 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
             {!locked.current ? (
                 <>
                     <div className="text-white flex justify-center">
-                        <button onClick={readyUpPlay} className="">
+                        <button onClick={readyUpPlay} className="steal-button">
                             Ready?
                         </button>
                     </div>
@@ -155,10 +155,18 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
             </div>
             <div className="text-white absolute left-1/2 up-0 w-1/2">
                 <div className="up-0 flex justify-center gap-8 my-8">
-                    <button onClick={select}>Select</button>
-                    <button onClick={take}>Take</button>
-                    <button onClick={pass}>Pass</button>
-                    <button onClick={swap}>Swap Cards</button>
+                    <button onClick={select} className="steal-button">
+                        Select
+                    </button>
+                    <button onClick={take} className="steal-button">
+                        Take
+                    </button>
+                    <button onClick={pass} className="steal-button">
+                        Pass
+                    </button>
+                    <button onClick={swap} className="steal-button">
+                        Swap Cards
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 my-16">
