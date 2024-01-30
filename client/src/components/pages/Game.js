@@ -82,7 +82,7 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
     );
 };
 
-const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, turn }) => {
+const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, turn, deck }) => {
     const [selected, setSelected] = useState(new Set());
     // Adding a value
     const addToSelected = (newValue) => {
@@ -145,7 +145,13 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
     return (
         <div className="relative">
             <div className="text-white absolute left-0 up-0 w-1/2">
-                <Opponents steal={steal} players={players} turn={turn} userId={userId} />
+                <Opponents
+                    steal={steal}
+                    players={players}
+                    turn={turn}
+                    userId={userId}
+                    deck={deck}
+                />
             </div>
             <div className="text-white absolute left-1/2 up-0 w-1/2">
                 <div className="up-0 flex justify-center gap-8 my-8">
@@ -269,6 +275,7 @@ const Game = ({ userId }) => {
                     playerDeck={playerDeck}
                     pile={pile}
                     turn={turn}
+                    deck={deck}
                 />
             ) : (
                 <div className="text-white steal-confirmation-page">
