@@ -330,7 +330,7 @@ const Game = ({ userId }) => {
                     players={players}
                     playerDeck={playerDeck}
                 />
-            ) : winner === -1 ? (
+            ) : gameState === "playing" ? (
                 block === -1 ? (
                     <GamePlayScreen
                         userId={userId}
@@ -368,7 +368,7 @@ const Game = ({ userId }) => {
             ) : (
                 <>
                     <div className="text-white flex justify-center">
-                        {players[winner].name} has won!
+                        {winner === -1 ? "No one" : players[winner].name} has won!
                     </div>
                     <div className="text-white flex justify-center Game-winner">
                         <Link to="/hub">back to games</Link>

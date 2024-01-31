@@ -12,6 +12,8 @@ const getSocketFromSocketID = (socketid) => io.sockets.connected[socketid];
 
 const sendGameState = (gameId) => {
     let game = gameLogic.idToGameMap[gameId];
+    //update turn
+    game.lastTurn = new Date();
     to_send = {
         players: game.players.map((player) => {
             return {

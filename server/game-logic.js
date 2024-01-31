@@ -2,6 +2,7 @@
 
 const game = require("./models/game");
 const User = require("./models/user");
+const { sendGameState } = require("./server-socket");
 /** Utils! */
 
 /** Helper to generate a random integer */
@@ -12,6 +13,19 @@ const getRandomInt = (min, max) => {
 };
 
 idToGameMap = {};
+const endgameifdisconnect = () => {
+    const currentTime = new Date();
+    for (const gameId in idToGameMap) {
+        const game = idToGameMap[gameId];
+        if (
+            game.gameState === "playing" &&
+            currentTime.getTime() - game.lastTurn.getTime() > 1000 * 60 * 10
+        ) {
+            game.gameState = "won";
+        }
+    }
+};
+const interval = setInterval(endgameifdisconnect, 10000);
 
 const makeGame = (name, gameId, creator = { name: "default", _id: "default" }) => {
     //console.log(Object.keys(idToGameMap).length);
@@ -28,6 +42,7 @@ const makeGame = (name, gameId, creator = { name: "default", _id: "default" }) =
         idx: 0, //for removal in declined block
         winner: -1,
         twoSevenEightTen: [4, 4, 4, 4],
+        lastTurn: new Date(),
     };
     console.log("hello", creator);
     idToGameMap[gameId] = game;
@@ -411,6 +426,7 @@ const selectPlay = (gameId, user, idx) => {
         //draw
         const news = redraw(game, val);
         if (game.players[game.turn].deck.length === 0) {
+            game.gameState = "won";
             game.winner = game.turn;
             for (let i = 0; i < game.players.length; i++) {
                 console.log(game.players[i]);
