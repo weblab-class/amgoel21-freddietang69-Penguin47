@@ -55,7 +55,7 @@ const addPlayerToGame = (gameId, user) => {
     let game = idToGameMap[gameId];
     let alreadyInGame = false; // MAKE SURE WE DONT ADD SAME PLAYER MULTIPLE TIMES
     for (player of game.players) alreadyInGame |= player._id == user._id;
-    if (!alreadyInGame) {
+    if (!alreadyInGame && game.gameState === "waiting") {
         game.players.push({
             _id: user._id,
             name: user.name,
