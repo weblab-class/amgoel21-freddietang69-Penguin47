@@ -1,7 +1,7 @@
+import { useParams } from "react-router-dom";
 import React from "react";
 
 import NavBar from "../modules/NavBar.js";
-import LobbyList from "../modules/LobbyList.js";
 
 /**
  * Hub has list of lobbies and possibly? chat room
@@ -9,13 +9,15 @@ import LobbyList from "../modules/LobbyList.js";
  * Proptypes
  * @param {string} userId
  */
-const Hub = ({ userId, handleLogin, handleLogout }) => {
+const Profile = ({ userId, handleLogin, handleLogout }) => {
+    const profileId = useParams().profileId;
+    console.log(profileId);
     return (
         <>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-            <LobbyList userId={userId} />
+            <div className="text-center m-[20%]">{profileId}</div>
         </>
     );
 };
 
-export default Hub;
+export default Profile;

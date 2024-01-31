@@ -7,42 +7,42 @@ const Rules = ({ userId, handleLogin, handleLogout }) => {
         <div>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
             <div className="mx-16">
-                <h1 class="underline decoration-2 mb-4 text-xl flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-5xl lg:text-6xl dark:text-white">
+                <h1 class="underline decoration-2 mb-4 text-xl flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-5xl lg:text-6xl dark:text-black">
                     Rules of Palace
                 </h1>
-                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-2xl lg:text-3xl dark:text-white">
+                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-2xl lg:text-3xl dark:text-black">
                     Overview
                 </h1>
-                <div className="flex justify-center text-white font-serif">
+                <div className="flex justify-center text-black font-serif">
                     Palace is a turn-based game for 3+ players played with a regular deck of card
                     (or more, if many players). The object of the game is to be the first player to
                     play all of their cards, ie have an empty hand. The basic structure of the game
                     revolves around playing a equal or higher numbered card than the previous card
                     played, but with many cards having special rules/powers.
                 </div>
-                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-2xl lg:text-3xl dark:text-white">
+                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-2xl lg:text-3xl dark:text-black">
                     Setup
                 </h1>
                 <div class="flex flex-col space-y-4">
-                    <div className="flex justify-center text-white font-serif">
+                    <div className="flex justify-center text-black font-serif">
                         Shuffle a Deck of Cards after removing the 2s, 7s, 10s, and Aces. Deal each
                         player 3 cards face down, which nobody (including the player) can currently
                         view. Next, shuffle the 2s, 7s, 10s, and Aces back into the remaining cards
                         and deal each player another 6 cards, which they can view. The remaining
                         cards become the draw pile.
                     </div>
-                    <div className="flex justify-center text-white font-serif">
+                    <div className="flex justify-center text-black font-serif">
                         Players don't touch their 3 facedown cards, but view their other 6 cards.
                         They choose 3 of these and place one of each of these on top of each of
                         their facedown cards. The remaining 3 cards they have will be their starting
                         hand.
                     </div>
                 </div>
-                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-2xl lg:text-3xl dark:text-white">
+                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-2xl lg:text-3xl dark:text-black">
                     Gameplay
                 </h1>
                 <div class="flex flex-col space-y-4">
-                    <div className="flex justify-center text-white font-serif">
+                    <div className="flex justify-center text-black font-serif">
                         The goal of Palace is to be the first to play all of your cards. On your
                         turn, you can play a card (or potentially multiple). If you cannot play a
                         card, you have to pick up all the cards in the current pile and the new pile
@@ -50,7 +50,7 @@ const Rules = ({ userId, handleLogin, handleLogout }) => {
                         the game, but there are additional rules about the cards in your deck. We
                         can split the game into 3 stages to explain these.
                     </div>
-                    <div className="flex justify-center text-white font-serif">
+                    <div className="flex justify-center text-black font-serif">
                         In the first stage, you start with the 3 cards in your hand and play if
                         possible. During this stage, there is still a drawpile. After your turn
                         (where you either played a card or picked the deck), you must pick cards
@@ -60,7 +60,7 @@ const Rules = ({ userId, handleLogin, handleLogout }) => {
                         you have played all the cards in your current hand, you can progress to
                         stage 2.{" "}
                     </div>
-                    <div className="flex justify-center text-white font-serif">
+                    <div className="flex justify-center text-black font-serif">
                         The moment you have played all the cards in your hand, you reach stage 2.
                         Here, pick up the 3 cards that you put faceup on top of your hidden cards at
                         the beginning. These become your new hand, and the game continues. One small
@@ -70,7 +70,7 @@ const Rules = ({ userId, handleLogin, handleLogout }) => {
                         well. Once you get rid of all cards in your hand in this section, you
                         progress to stage 3.{" "}
                     </div>
-                    <div className="flex justify-center text-white font-serif">
+                    <div className="flex justify-center text-black font-serif">
                         In stage 3, you now reach your unknown facedown cards. You now pick up
                         exactly one of your facedown cards and add it to your hand. You cannot
                         immediately play it like in stage 2. The game progresses, and once your hand
@@ -80,19 +80,19 @@ const Rules = ({ userId, handleLogin, handleLogout }) => {
                         you are the first to do so), you win the game!{" "}
                     </div>
                 </div>
-                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-2xl lg:text-3xl dark:text-white">
+                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-2xl lg:text-3xl dark:text-black">
                     Playing Cards
                 </h1>
-                <div className="flex justify-center text-white font-serif">
+                <div className="flex justify-center text-black font-serif">
                     The most basic rules of playing cards in Palace are that you must almost always
                     play a higher card than the previous card played (with 2 being the lowest and
                     Ace being highest) and that you can play multiple of the same value card. There
                     are some special rules which we will know go over.
                 </div>
-                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-50 md:text-xl lg:text-2xl dark:text-white">
+                <h1 class="underline decoration-2 mb-4 text-base flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-xl lg:text-2xl dark:text-black">
                     Special Rules
                 </h1>
-                <ul class="list-disc text-white font-serif">
+                <ul class="list-disc text-black font-serif">
                     <li>
                         2 is a wildcard that can be played on top of any card and allows the player
                         of the card to go again (allowing the user to play anything on top of it)

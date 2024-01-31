@@ -8,6 +8,7 @@ import Home from "./pages/Home.js";
 import Hub from "./pages/Hub.js";
 import Rules from "./pages/Rules.js";
 import Game from "./pages/Game.js";
+import Profile from "./pages/Profile.js";
 
 import "../utilities.css";
 
@@ -45,7 +46,7 @@ const App = () => {
         post("/api/logout");
     };
 
-    document.body.style = "background: rgb(5, 6, 23);";
+    document.body.style = "background: rgb(242, 242, 242);";
 
     return (
         <div>
@@ -53,6 +54,7 @@ const App = () => {
                 <Route path="/" element={<Home handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
                 <Route path="/rules" element={<Rules handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
                 <Route path="/hub" element={<Hub handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
+                <Route path="/profile/:profileId" element={<Profile handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
                 <Route path="/game/:gameId" element={<Game userId={userId} />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
