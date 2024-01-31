@@ -13,7 +13,7 @@ const getRandomInt = (min, max) => {
 
 idToGameMap = {};
 
-const makeGame = (name, gameId, creator = { name: "default", id: "default" }) => {
+const makeGame = (name, gameId, creator = { name: "default", _id: "default" }) => {
     //console.log(Object.keys(idToGameMap).length);
     let game = {
         name: name,
@@ -27,7 +27,9 @@ const makeGame = (name, gameId, creator = { name: "default", id: "default" }) =>
         waiting: -1,
         idx: 0, //for removal in declined block
         winner: -1,
+        twoSevenEightTen: [4, 4, 4, 4],
     };
+    console.log("hello", creator);
     idToGameMap[gameId] = game;
 };
 
@@ -116,7 +118,7 @@ const startGame = (game) => {
 const startSelect = (game) => {
     const deck = [];
     for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
-        for (let value = 5; value <= 8; value++) {
+        for (let value = 3; value <= 13; value++) {
             if (value !== 7 && value !== 10) {
                 deck.push({ suit: suit, value: value, revealed: false });
             }
@@ -134,11 +136,23 @@ const startSelect = (game) => {
             game.players[i].bottoms.push(deck.pop());
         }
     }
-    for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
-        for (let value of [2, 7, 10, 14]) {
-            deck.push({ suit: suit, value: value, revealed: false });
+    const values = [2, 7, 10, 14];
+    console.log("custom", game.twoSevenEightTen);
+    for (let i = 0; i < values.length; i++) {
+        for (const suit of ["hearts", "spades", "clubs", "diamonds"].slice(
+            0,
+            game.twoSevenEightTen[i]
+        )) {
+            console.log("interesting");
+            deck.push({ suit: suit, value: values[i], revealed: false });
         }
     }
+
+    // for (const suit of ["hearts", "spades", "clubs", "diamonds"]) {
+    //     for (let value of [2, 7, 10, 14]) {
+    //         deck.push({ suit: suit, value: value, revealed: false });
+    //     }
+    // }
     for (let i = deck.length - 1; i >= 0; i--) {
         // Pick a remaining element.
         randomIndex = Math.floor(Math.random() * (i + 1));
@@ -177,6 +191,16 @@ const redraw = (game, val) => {
         }
     }
     return ret;
+};
+
+const editCards = (gameId, user, card, value) => {
+    const game = idToGameMap[gameId];
+    console.log("trying to edit", card, value, user._id, game.creator._id);
+    if (game.gameState !== "waiting" || user._id !== game.creator._id) {
+        return false;
+    }
+    console.log("??");
+    game.twoSevenEightTen[card] = value;
 };
 
 const selectTop = (gameId, user, idx) => {
@@ -449,4 +473,5 @@ module.exports = {
     swap,
     readyUpSelect,
     readyUpPlay,
+    editCards,
 };

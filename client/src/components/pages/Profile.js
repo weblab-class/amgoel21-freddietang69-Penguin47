@@ -13,6 +13,7 @@ const Profile = ({ userId }) => {
     useEffect(() => {
         document.title = "Profile Page";
         if (profileId) {
+            console.log("weird", profileId);
             get(`/api/user`, { _id: profileId }).then((userObj) => {
                 if (userObj) {
                     setUser(userObj);

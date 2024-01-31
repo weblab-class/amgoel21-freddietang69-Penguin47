@@ -21,6 +21,7 @@ const sendGameState = (gameId) => {
                 tops: player.tops,
                 bottoms: player.bottoms.length,
                 revealed: player.deck.filter((card) => card.revealed),
+                readyToSelect: player.readyToSelect,
             };
         }),
         turn: game.turn,
@@ -28,6 +29,7 @@ const sendGameState = (gameId) => {
         deck: game.deck.length,
         pile: game.pile,
         winner: game.winner,
+        creator: game.creator._id,
     };
     let i = 0;
     for (const player of game.players) {
@@ -81,6 +83,9 @@ const steal = (gameId, user, idx, victim) => {
 const swap = (gameId, user, cards) => {
     gameLogic.swap(gameId, user, cards);
     sendGameState(gameId);
+};
+const editCards = (gameId, user, card, value) => {
+    gameLogic.editCards(gameId, user, card, value);
 };
 const block = (gameId, user, response) => {
     gameLogic.block(gameId, user, response);
@@ -166,6 +171,11 @@ module.exports = {
             socket.on("swap", (data) => {
                 const user = getUserFromSocketID(socket.id);
                 if (user) swap(data.gameId, user, data.cards);
+            });
+            socket.on("edit", (data) => {
+                const user = getUserFromSocketID(socket.id);
+                console.log("edit", data);
+                if (user) editCards(data.gameId, user, data.card, data.value);
             });
         });
     },

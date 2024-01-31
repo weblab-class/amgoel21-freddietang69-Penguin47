@@ -9,24 +9,69 @@ import "./Game.css";
 import CardContainer from "../modules/CardContainer.js";
 import { useParams } from "react-router-dom";
 
-const GameWaiting = ({ gameId, readySelect }) => {
+const GameWaiting = ({ gameId, readySelect, isCreator, players }) => {
+    const [sliderValues, setSliderValues] = useState([4, 4, 4, 4]);
     const readyUpSelect = () => {
         if (gameId !== undefined) {
             socket.emit("readySelect", gameId);
         }
     };
+    const handleSliderChange = (event, index) => {
+        const value = parseInt(event.target.value); // Parse the slider value to an integer
+        socket.emit("edit", { gameId: gameId, card: index, value: value });
+        setSliderValues(
+            sliderValues.map((val, ind) => {
+                return ind === index ? value : val;
+            })
+        ); // Update the slider value state
+    };
+    const ready = players.filter((player) => player.readyToSelect).length;
     return (
-        <div className="flex h-80 items-center justify-center">
+        <div className="flex flex-col h-80 items-center justify-center text-white p-30 mt-20">
             {!readySelect ? (
-                <button
-                    class="text-white bg-blue-400 px-4 py-2 rounded-full font-bold"
-                    onClick={readyUpSelect}
-                >
-                    Click to ready up
-                </button>
+                <div className="m-1">
+                    <button
+                        className="text-white bg-blue-400 px-4 py-2 rounded-full font-bold steal-button"
+                        onClick={readyUpSelect}
+                    >
+                        Click to ready up
+                    </button>
+                    <p>
+                        {"(" + ready}/{players.length + ")"} players ready
+                    </p>
+                </div>
             ) : (
-                <div class="text-white">Waiting on other players</div>
+                <div className="text-white items-center justify-center">
+                    {ready === players.length ? (
+                        <p>Waiting for other players</p>
+                    ) : (
+                        <p>Waiting on other players</p>
+                    )}
+                    <p>
+                        {"(" + ready}/{players.length + ")"} players ready
+                    </p>
+                </div>
             )}
+            {isCreator &&
+                [2, 7, 10, 14].map((cval, index) => {
+                    return (
+                        <div className="items-center justify-center m-3">
+                            <p>
+                                {cval === 14 ? "Aces" : cval + "'s"} in Deck: {sliderValues[index]}
+                            </p>{" "}
+                            <input
+                                type="range"
+                                min={0}
+                                max={4}
+                                value={sliderValues[index]}
+                                onChange={(event) => {
+                                    handleSliderChange(event, index);
+                                }}
+                            />
+                            {/* Display the current value of the slider */}
+                        </div>
+                    );
+                })}
         </div>
     );
 };
@@ -50,7 +95,7 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
                 <>
                     <div className="text-white flex justify-center">
                         <button onClick={readyUpPlay} className="steal-button">
-                            Ready?
+                            Submit 3 Selected Top Cards
                         </button>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
@@ -216,7 +261,7 @@ const Game = ({ userId }) => {
     const [turn, setTurn] = useState(0);
     const [block, setBlock] = useState(-1);
     const [winner, setWinner] = useState(-1);
-
+    const [creator, setCreator] = useState(-1);
     useEffect(() => {
         if (userId) {
             console.log(userId, gameId);
@@ -259,6 +304,7 @@ const Game = ({ userId }) => {
         setPile(update.pile);
         setTurn(update.turn);
         setWinner(update.winner);
+        setCreator(update.creator);
     };
 
     const respond = (response) => {
@@ -271,7 +317,12 @@ const Game = ({ userId }) => {
             {!userId ? (
                 <div class="text-white">Please Log In</div>
             ) : gameState === "waiting" ? (
-                <GameWaiting gameId={gameId} readySelect={readySelect} />
+                <GameWaiting
+                    gameId={gameId}
+                    readySelect={readySelect}
+                    isCreator={creator === userId}
+                    players={players}
+                />
             ) : gameState === "selecting" ? (
                 <GameSelecting
                     gameId={gameId}
