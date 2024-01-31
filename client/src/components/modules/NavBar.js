@@ -64,7 +64,7 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                                     googleLogout();
                                     handleLogout();
                                 }}
-                                className="text-xl bg-yellow-500 p-2 rounded-full"
+                                className="text-xl bg-green-500 p-2 rounded-full"
                             >
                                 Logout
                             </button>

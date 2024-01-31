@@ -51,12 +51,12 @@ const LobbyList = ({ userId }) => {
     };
 
     return (
-        <div className="ml-[10%] mr-[20%] my-16 bg-gray-300 px-8 pb-8">
+        <div className="mx-[15%] my-16 bg-gray-300 border-2 border-black rounded-2xl px-8 pb-8">
             <div className="p-2 flex justify-center">
                 {userId ? (
                     <div>
                         <input placeholder="Lobby" onChange={onChange}></input>
-                        <button className="text-black mx-2 p-1 bg-teal-200 rounded-full" onClick={makeLobby}>
+                        <button className="text-black mx-2 p-1 bg-slate-400 rounded-full" onClick={makeLobby}>
                             Create New Lobby
                         </button>
                     </div>
