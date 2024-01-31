@@ -6,7 +6,7 @@ const Rules = ({ userId, handleLogin, handleLogout }) => {
     return (
         <div>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-            <div className="mx-16">
+            <div className="mx-16 mb-6">
                 <h1 class="underline decoration-2 mb-4 text-xl flex justify-center font-sans leading-none tracking-tight text-neutral-250 md:text-5xl lg:text-6xl dark:text-black">
                     Rules of Palace
                 </h1>

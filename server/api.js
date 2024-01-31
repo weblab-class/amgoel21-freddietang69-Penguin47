@@ -12,6 +12,7 @@ const express = require("express");
 const User = require("./models/user");
 const Lobby = require("./models/lobby");
 const Game = require("./models/game");
+const Message = require("./models/message");
 
 // import authentication library
 const auth = require("./auth");
@@ -151,6 +152,22 @@ router.get("/user", auth.ensureLoggedIn, (req, res) => {
         //console.log(data);
         res.send(data);
     });
+});
+
+router.get("/messages", (req, res) => {
+    Message.find().then((data) => {
+        res.send(data);
+    });
+});
+
+router.post("/message", auth.ensureLoggedIn, (req, res) => {
+    if (req.user) {
+        const message = new Message({
+            creator: req.user.name,
+            content: req.body.content,
+        });
+        message.save();
+    }
 });
 
 // anything else falls to this "not found" case
