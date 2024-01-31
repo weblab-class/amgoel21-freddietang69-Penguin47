@@ -45,9 +45,14 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                 <Link to="/hub" className="NavBar-link">
                     Join a Game
                 </Link>
-                <Link to={"/profile/" + userId} className="NavBar-link">
-                    Profile
-                </Link>
+                {userId && (
+                    <Link to={`/profile/${userId}`} className="NavBar-link">
+                        Profile
+                    </Link>
+                )}
+                {/* <Link to="/game" className="NavBar-link">
+                    game
+                </Link> */}
             </div>
             <div className="absolute left-[80%] top-0 h-full w-1/5 flex justify-center items-center gap-8">
                 <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>

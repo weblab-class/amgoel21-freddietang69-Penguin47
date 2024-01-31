@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-  name: String,
-  googleid: String,
+    name: String,
+    googleid: String,
+    wins: Number,
+    losses: Number,
+    bio: String,
 });
 
 // compile model from schema

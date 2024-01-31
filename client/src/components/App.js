@@ -9,7 +9,6 @@ import Hub from "./pages/Hub.js";
 import Rules from "./pages/Rules.js";
 import Game from "./pages/Game.js";
 import Profile from "./pages/Profile.js";
-
 import "../utilities.css";
 
 import { socket } from "../client-socket.js";
@@ -51,12 +50,39 @@ const App = () => {
     return (
         <div>
             <Routes>
-                <Route path="/" element={<Home handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
-                <Route path="/rules" element={<Rules handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
-                <Route path="/hub" element={<Hub handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
-                <Route path="/profile/:profileId" element={<Profile handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />} />
+                <Route
+                    path="/"
+                    element={
+                        <Home
+                            handleLogin={handleLogin}
+                            handleLogout={handleLogout}
+                            userId={userId}
+                        />
+                    }
+                />
+                <Route
+                    path="/rules"
+                    element={
+                        <Rules
+                            handleLogin={handleLogin}
+                            handleLogout={handleLogout}
+                            userId={userId}
+                        />
+                    }
+                />
+                <Route
+                    path="/hub"
+                    element={
+                        <Hub
+                            handleLogin={handleLogin}
+                            handleLogout={handleLogout}
+                            userId={userId}
+                        />
+                    }
+                />
                 <Route path="/game/:gameId" element={<Game userId={userId} />} />
                 <Route path="*" element={<NotFound />} />
+                <Route path="/profile/:userId" element={<Profile userId={userId} />} />
             </Routes>
         </div>
     );

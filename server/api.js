@@ -52,18 +52,20 @@ router.post("/initsocket", (req, res) => {
 router.get("/lobbies", (req, res) => {
     // Lobby.find({}).then((data) => res.send(data));
     res.send(
-        Object.values(gameLogic.idToGameMap).map((game) => {
-            return {
-                name: game.name,
-                _id: game._id,
-                players: game.players.map((player) => {
-                    return {
-                        name: player.name,
-                    };
-                }),
-                creator: game.creator,
-            };
-        })
+        Object.values(gameLogic.idToGameMap)
+            .filter((game) => game.winner === -1)
+            .map((game) => {
+                return {
+                    name: game.name,
+                    _id: game._id,
+                    players: game.players.map((player) => {
+                        return {
+                            name: player.name,
+                        };
+                    }),
+                    creator: game.creator,
+                };
+            })
     );
 });
 

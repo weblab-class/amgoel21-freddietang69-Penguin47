@@ -27,6 +27,7 @@ const sendGameState = (gameId) => {
         gameState: game.gameState,
         deck: game.deck.length,
         pile: game.pile,
+        winner: game.winner,
     };
     let i = 0;
     for (const player of game.players) {
