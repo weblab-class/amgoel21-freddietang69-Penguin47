@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { socket } from "../../client-socket.js";
 import { post } from "../../utilities";
 import Opponents from "../modules/Opponents.js";
@@ -212,6 +213,7 @@ const Game = ({ userId }) => {
     const [gameState, setgameState] = useState("waiting");
     const [turn, setTurn] = useState(0);
     const [block, setBlock] = useState(-1);
+    const [winner, setWinner] = useState(-1);
 
     useEffect(() => {
         if (userId) {
@@ -254,6 +256,7 @@ const Game = ({ userId }) => {
         setDeck(update.deck);
         setPile(update.pile);
         setTurn(update.turn);
+        setWinner(update.winner);
     };
 
     const respond = (response) => {
@@ -274,39 +277,50 @@ const Game = ({ userId }) => {
                     players={players}
                     playerDeck={playerDeck}
                 />
-            ) : block === -1 ? (
-                <GamePlayScreen
-                    userId={userId}
-                    gameId={gameId}
-                    gameState={gameState}
-                    players={players}
-                    playerDeck={playerDeck}
-                    pile={pile}
-                    turn={turn}
-                    deck={deck}
-                />
-            ) : (
-                <div className="text-white steal-confirmation-page">
-                    <h1>{players[block].name} is trying to steal from you!</h1>
-                    <div className="button-container">
-                        <button
-                            className="steal-button block"
-                            onClick={() => {
-                                respond(true);
-                            }}
-                        >
-                            Block
-                        </button>
-                        <button
-                            className="steal-button no-block"
-                            onClick={() => {
-                                respond(false);
-                            }}
-                        >
-                            Don't Block
-                        </button>
+            ) : winner === -1 ? (
+                block === -1 ? (
+                    <GamePlayScreen
+                        userId={userId}
+                        gameId={gameId}
+                        gameState={gameState}
+                        players={players}
+                        playerDeck={playerDeck}
+                        pile={pile}
+                        turn={turn}
+                        deck={deck}
+                    />
+                ) : (
+                    <div className="text-white steal-confirmation-page">
+                        <h1>{players[block].name} is trying to steal from you!</h1>
+                        <div className="button-container">
+                            <button
+                                className="steal-button block"
+                                onClick={() => {
+                                    respond(true);
+                                }}
+                            >
+                                Block
+                            </button>
+                            <button
+                                className="steal-button no-block"
+                                onClick={() => {
+                                    respond(false);
+                                }}
+                            >
+                                Don't Block
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )
+            ) : (
+                <>
+                    <div className="text-white flex justify-center">
+                        {players[winner].name} has won!
+                    </div>
+                    <div className="text-white flex justify-center Game-winner">
+                        <Link to="/hub">back to games</Link>
+                    </div>
+                </>
             )}
         </>
     );

@@ -1,7 +1,7 @@
 /** constants */
 
 const game = require("./models/game");
-
+const User = require("./models/user");
 /** Utils! */
 
 /** Helper to generate a random integer */
@@ -26,6 +26,7 @@ const makeGame = (name, gameId, creator = { name: "default", id: "default" }) =>
         turn: 0,
         waiting: -1,
         idx: 0, //for removal in declined block
+        winner: -1,
     };
     idToGameMap[gameId] = game;
 };
@@ -385,6 +386,17 @@ const selectPlay = (gameId, user, idx) => {
         }
         //draw
         const news = redraw(game, val);
+        if (game.players[game.turn].deck.length === 0) {
+            game.winner = game.turn;
+            for (let i = 0; i < game.players.length; i++) {
+                console.log(game.players[i]);
+                User.findOne({ _id: game.players[i]._id }).then((user) => {
+                    user.wins += i === game.winner ? 1 : 0;
+                    user.losses += i === game.winner ? 0 : 1;
+                    user.save();
+                });
+            }
+        }
         game.players[game.turn].canPlay = news;
         //TODO implement playing multiple cards logic
         //rotate players
@@ -398,8 +410,6 @@ const selectPlay = (gameId, user, idx) => {
             //so can't take anymore
             game.players[game.turn].canPlay.add(-1);
         }
-
-        console.log(game.pile);
     }
     //res.send({ 1: "selectPlayDone" });
 };

@@ -45,6 +45,11 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                 <Link to="/hub" className="NavBar-link">
                     Join a Game
                 </Link>
+                {userId && (
+                    <Link to={`/profile/${userId}`} className="NavBar-link">
+                        Profile
+                    </Link>
+                )}
                 {/* <Link to="/game" className="NavBar-link">
                     game
                 </Link> */}
