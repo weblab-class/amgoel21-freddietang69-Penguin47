@@ -148,11 +148,16 @@ router.post("/addlobbyplayer", (req, res) => {
     // });
 });
 
-router.get("/user", auth.ensureLoggedIn, (req, res) => {
-    //console.log("getting user id", req.query._id);
+// should we make them logged in?
+router.get("/user", (req, res) => {
+    console.log("getting user id", req.query._id);
     User.findOne({ _id: req.query._id }).then((data) => {
-        //console.log(data);
-        res.send(data);
+        console.log(data);
+        if (data) {
+            res.send(data);
+        } else {
+            res.send({ response: "user not found" });
+        }
     });
 });
 

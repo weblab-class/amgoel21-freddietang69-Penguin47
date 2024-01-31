@@ -48,7 +48,7 @@ const LobbyList = ({ userId }) => {
     };
 
     return (
-        <div className="mx-[20%] my-16 bg-gray-300 px-8 pb-8">
+        <div className="ml-[10%] mr-[20%] my-16 bg-gray-300 px-8 pb-8">
             <div className="bg-red-500">
                 {userId ? (
                     <div>

@@ -82,7 +82,7 @@ const App = () => {
                 />
                 <Route path="/game/:gameId" element={<Game userId={userId} />} />
                 <Route path="*" element={<NotFound />} />
-                <Route path="/profile/:userId" element={<Profile userId={userId} />} />
+                <Route path="/profile/:profileId" element={<Profile userId={userId} />} />
             </Routes>
         </div>
     );

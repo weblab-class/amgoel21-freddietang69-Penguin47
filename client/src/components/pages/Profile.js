@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { get } from "../../utilities";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import "../../utilities.css";
 import "./Profile.css";
 
-const Profile = (props) => {
-    const [catHappiness, setCatHappiness] = useState(0);
+const Profile = ({ userId }) => {
     const [user, setUser] = useState();
+    const profileId = useParams().profileId.toString();
+    // const profileId = "65b9c98891203e363684c92e";
 
     useEffect(() => {
         document.title = "Profile Page";
-        get(`/api/user`, { _id: props.userId }).then((userObj) => setUser(userObj));
+        if (profileId) {
+            get(`/api/user`, { _id: profileId }).then((userObj) => {
+                if (userObj) {
+                    setUser(userObj);
+                }
+            });
+        }
     }, []);
 
     if (!user) {
         return <div> Loading! </div>;
     }
+
+    if (user.response === "user not found") {
+        return <div>User not found.</div>;
+    }
+
     return (
         <div>
             <h1 className="Profile-name u-textCenter">{user.name}</h1>
@@ -40,7 +52,7 @@ const Profile = (props) => {
             <div className="text-white flex justify-center Game-winner">
                 <Link to="/">back to home</Link>
             </div>
-            {user.userId === props.userId}
+            {/* {user.userId === userId} */}
         </div>
     );
 };
