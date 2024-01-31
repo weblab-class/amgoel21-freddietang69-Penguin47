@@ -312,7 +312,7 @@ const steal = (gameId, user, idx, victim) => {
         game.players[game.turn].canPlay.size > 1 ||
         game.players[game.turn].deck[idx].value !== 8
     ) {
-        return false;
+        return -1;
     }
 
     let topind = -1;
