@@ -155,10 +155,6 @@ router.get("/user", auth.ensureLoggedIn, (req, res) => {
     });
 });
 
-router.get("/hi", (req, res) => {
-    console.log("hi");
-});
-
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
     console.log(`API route not found: ${req.method} ${req.url}`);

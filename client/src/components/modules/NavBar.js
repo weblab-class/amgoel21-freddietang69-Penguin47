@@ -20,19 +20,19 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
     }, [userId]);
 
     return (
-        <div className="NavBar-container">
+        <div className="NavBar-container text-white">
             <div className="absolute left-0 top-0 h-full w-1/5">
-                <a href="/">
+                {/* <a href="/">
                     <img src={logo} alt="Palace" width={100}></img>
+                </a> */}
+                <a
+                    href="/"
+                    className="text-xl text-extrabold flex items-center justify-center h-full"
+                >
+                    Palace
                 </a>
             </div>
             <div className="absolute left-[20%] top-0 h-full w-3/5 flex justify-center items-center gap-8">
-                {/* <Link to="/" className="NavBar-link">
-                    Home
-                </Link> */}
-                {/* <a href="/rules" className="NavBar-link">
-                    <h1>Rules</h1>
-                </a> */}
                 <Link to="/rules" className="NavBar-link">
                     Learn about Rules
                 </Link>
@@ -57,15 +57,18 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
             <div className="absolute left-[80%] top-0 h-full w-1/5 flex justify-center items-center gap-8">
                 <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                     {userId ? (
-                        <button
-                            onClick={() => {
-                                googleLogout();
-                                handleLogout();
-                            }}
-                            className="text-xl"
-                        >
-                            Logout
-                        </button>
+                        <>
+                            <div className="text-xl">{userName}</div>
+                            <button
+                                onClick={() => {
+                                    googleLogout();
+                                    handleLogout();
+                                }}
+                                className="text-xl bg-yellow-500 p-2 rounded-full"
+                            >
+                                Logout
+                            </button>
+                        </>
                     ) : (
                         <GoogleLogin
                             clientId={GOOGLE_CLIENT_ID}
@@ -75,7 +78,6 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                         />
                     )}
                 </GoogleOAuthProvider>
-                <div className="text-xl">{userName}</div>
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ import { socket } from "../../client-socket.js";
  * Proptypes
  * @param {string} userId
  */
-const LobbyList = (props) => {
+const LobbyList = ({ userId }) => {
     const [lobbies, setLobbies] = useState([]);
     const [value, setValue] = useState("default");
     const navigate = useNavigate();
@@ -50,7 +50,7 @@ const LobbyList = (props) => {
     return (
         <div className="mx-[20%] my-16 bg-gray-300 px-8 pb-8">
             <div className="bg-red-500">
-                {props.userId ? (
+                {userId ? (
                     <div>
                         <input placeholder="Lobby Name" onChange={onChange}></input>
                         <button className="text-white" onClick={makeLobby}>
@@ -63,7 +63,7 @@ const LobbyList = (props) => {
             </div>
             <div className="grid grid-cols-2 gap-8">
                 {lobbies.map((lobby) => {
-                    return <Lobby userId={props.userId} lobby={lobby} key={lobby._id}></Lobby>;
+                    return <Lobby userId={userId} lobby={lobby} key={lobby._id}></Lobby>;
                 })}
             </div>
         </div>

@@ -45,7 +45,7 @@ const App = () => {
         post("/api/logout");
     };
 
-    document.body.style = "background: rgb(5, 6, 23);";
+    document.body.style = "background: rgb(242, 242, 242);";
 
     return (
         <div>

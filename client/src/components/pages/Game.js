@@ -201,6 +201,8 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
 };
 
 const Game = ({ userId }) => {
+    document.body.style = "background: rgb(5, 6, 23);";
+
     const gameId = useParams().gameId;
     const [readySelect, setReadySelect] = useState(false);
     const [readyPlay, setReadyPlay] = useState(false);

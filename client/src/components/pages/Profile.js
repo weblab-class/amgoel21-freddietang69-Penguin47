@@ -18,7 +18,7 @@ const Profile = (props) => {
         return <div> Loading! </div>;
     }
     return (
-        <div className="text-white">
+        <div>
             <h1 className="Profile-name u-textCenter">{user.name}</h1>
             <hr className="Profile-linejj" />
             <div className="u-flex">

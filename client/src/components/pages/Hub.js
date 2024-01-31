@@ -10,13 +10,10 @@ import LobbyList from "../modules/LobbyList.js";
  * @param {string} userId
  */
 const Hub = ({ userId, handleLogin, handleLogout }) => {
-    //console.log("hub", props.userId);
     return (
         <>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
             <LobbyList userId={userId} />
-            {/* <div className="text-white">todo: make lobbies</div>
-            <div className="text-white">yaaaaaaa</div> */}
         </>
     );
 };
