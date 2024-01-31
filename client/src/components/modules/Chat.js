@@ -4,19 +4,22 @@ import { get, post } from "../../utilities";
 
 import { socket } from "../../client-socket.js";
 
-const Chat = () => {
+const Chat = ({ gameId }) => {
     const [messages, setMessages] = useState([]);
     const [value, setValue] = useState("");
 
     useEffect(() => {
-        get("/api/messages").then((data) => {
-            setMessages(data);
-        });
+        if (gameId) {
+            console.log(gameId);
+            get("/api/messages", { gameId: gameId }).then((data) => {
+                setMessages(data);
+            });
+        }
     }, []);
 
     useEffect(() => {
         const callback = (useless) => {
-            get("/api/messages").then((data) => {
+            get("/api/messages", { gameId: gameId }).then((data) => {
                 setMessages(data);
             });
         };
@@ -27,8 +30,8 @@ const Chat = () => {
     }, []);
 
     const submitMessage = () => {
-        if (value) {
-            post("/api/message", { content: value });
+        if (value && gameId) {
+            post("/api/message", { gameId: gameId, content: value });
             setValue("");
         }
     };
@@ -44,22 +47,29 @@ const Chat = () => {
     };
 
     return (
-        <div>
-            {messages.map((message, index) => {
-                return (
-                    <div index={index}>
-                        {message.creator} | {message.content}
-                    </div>
-                );
-            })}
-            <div>
+        <div className="h-64 m-4 bg-slate-400 bg-opacity-20">
+            <div className="h-[83%] overflow-auto p-2">
+                {messages.map((message, index) => {
+                    return (
+                        <div key={index}>
+                            {message.creator} | {message.content}
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="h-[10%] p-1">
                 <input
                     placeholder="Message"
                     value={value}
                     onChange={onChange}
                     onKeyDown={handleKeyDown}
+                    className="text-black"
                 ></input>
-                <button type="submit" onClick={submitMessage}>
+                <button
+                    type="submit"
+                    onClick={submitMessage}
+                    className="border border-green-500 m-2 px-1 bg-gray-100 text-blue-700"
+                >
                     Submit
                 </button>
             </div>

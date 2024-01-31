@@ -20,7 +20,7 @@ const Lobby = ({ userId, lobby }) => {
     };
 
     return (
-        <div className="bg-yellow-500 border-2 border-black flex m-2">
+        <div className="bg-yellow-300 border-2 border-black rounded-lg flex m-2">
             <div className="basis-1/2">
                 <div className="text-center">{lobby.name}</div>
                 <div className="text-center">Players: {lobby.players.length}</div>
@@ -28,7 +28,9 @@ const Lobby = ({ userId, lobby }) => {
             </div>
             <div className="basis-1/2 flex justify-center items-center">
                 {userId ? (
-                    <button onClick={joinLobby}>Click to join </button>
+                    <button onClick={joinLobby} className="hover:font-semibold">
+                        Click to join
+                    </button>
                 ) : (
                     <div>Can't join until logged in</div>
                 )}

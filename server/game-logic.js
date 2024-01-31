@@ -43,6 +43,7 @@ const makeGame = (name, gameId, creator = { name: "default", _id: "default" }) =
         winner: -1,
         twoSevenEightTen: [4, 4, 4, 4],
         lastTurn: new Date(),
+        messages: [],
     };
     console.log("hello", creator);
     idToGameMap[gameId] = game;

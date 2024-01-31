@@ -8,7 +8,7 @@ const Opponents = ({ players, turn, userId, steal, deck }) => {
         <div>
             {players.map((player, index) => {
                 return (
-                    <div className="text-white m-5 border-2 border-dotted border-green-500 bg-gray-600 p-3">
+                    <div className="text-white m-5 border-2 border-dotted border-green-500 bg-gray-600 p-3" key={index}>
                         {player._id === userId ? (
                             <div className="flex justify-center"> YOU </div>
                         ) : (

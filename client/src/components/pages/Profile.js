@@ -29,6 +29,8 @@ const Profile = ({ userId }) => {
     if (user.response === "user not found") {
         return <div>User not found.</div>;
     }
+    
+    document.body.style = "background: rgb(242, 242, 242);";
 
     return (
         <div>

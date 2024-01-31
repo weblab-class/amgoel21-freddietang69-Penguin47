@@ -11,17 +11,17 @@ import Chat from "../modules/Chat.js";
  * @param {string} userId
  */
 const Hub = ({ userId, handleLogin, handleLogout }) => {
+    document.body.style = "background: rgb(242, 242, 242);";
     return (
         <>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-            <div className="flex">
+            <LobbyList userId={userId} />
+            {/* <div className="flex">
                 <div className="basis-2/3">
                     <LobbyList userId={userId} />
                 </div>
-                <div className="basis-1/3">
-                    <Chat />
-                </div>
-            </div>
+                <div className="basis-1/3"><Chat /></div>
+            </div> */}
         </>
     );
 };

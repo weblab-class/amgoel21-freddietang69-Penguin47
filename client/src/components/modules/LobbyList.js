@@ -14,7 +14,7 @@ import { socket } from "../../client-socket.js";
  */
 const LobbyList = ({ userId }) => {
     const [lobbies, setLobbies] = useState([]);
-    const [value, setValue] = useState("default");
+    const [value, setValue] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -38,9 +38,12 @@ const LobbyList = ({ userId }) => {
     }, []);
 
     const makeLobby = () => {
-        post("/api/makelobby", { name: value }).then((data) => {
-            navigate("/game/" + data.gameId);
-        });
+        if (value) {
+            post("/api/makelobby", { name: value }).then((data) => {
+                navigate("/game/" + data.gameId);
+            });
+            setValue("");
+        }
     };
 
     const onChange = (event) => {
@@ -48,12 +51,12 @@ const LobbyList = ({ userId }) => {
     };
 
     return (
-        <div className="ml-[10%] mr-[20%] my-16 bg-gray-300 px-8 pb-8">
-            <div className="bg-red-500">
+        <div className="mx-[15%] my-16 bg-gray-300 border-2 border-black rounded-2xl px-8 pb-8">
+            <div className="p-2 flex justify-center">
                 {userId ? (
                     <div>
-                        <input placeholder="Lobby Name" onChange={onChange}></input>
-                        <button className="text-white" onClick={makeLobby}>
+                        <input placeholder="Lobby" onChange={onChange}></input>
+                        <button className="text-black mx-2 p-1 bg-slate-400 rounded-full" onClick={makeLobby}>
                             Create New Lobby
                         </button>
                     </div>
