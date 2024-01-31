@@ -7,6 +7,7 @@
 |
 */
 const express = require("express");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 // import models so we can interact with the database
 const User = require("./models/user");
@@ -151,6 +152,10 @@ router.post("/addlobbyplayer", (req, res) => {
 // should we make them logged in?
 router.get("/user", (req, res) => {
     console.log("getting user id", req.query._id);
+    if (!ObjectId.isValid(req.query._id)) {
+        res.send({ response: "user not found" });
+        return;
+    }
     User.findOne({ _id: req.query._id }).then((data) => {
         console.log(data);
         if (data) {
