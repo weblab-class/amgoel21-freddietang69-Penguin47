@@ -27,7 +27,7 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                 </a> */}
                 <a
                     href="/"
-                    className="text-xl text-extrabold flex items-center justify-center h-full"
+                    className="font-extrabold text-3xl flex items-center justify-center h-full"
                 >
                     Palace
                 </a>

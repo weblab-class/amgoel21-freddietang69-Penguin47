@@ -178,7 +178,9 @@ router.post("/message", auth.ensureLoggedIn, (req, res) => {
             creator: req.user.name,
             content: req.body.content,
         });
-        message.save();
+        message.save().then((data) => {
+            socketManager.getIo().emit("message", {});
+        });
     }
 });
 

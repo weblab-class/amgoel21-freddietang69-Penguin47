@@ -8,7 +8,7 @@ const Home = ({ userId, handleLogin, handleLogout }) => {
     return (
         <div>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-            <h1 class="mb-4 text-xl flex justify-center font-mono leading-none tracking-tight text-neutral-250 md:text-5xl lg:text-6xl dark:text-black">
+            <h1 class="mb-4 text-xl flex justify-center font-mono leading-none tracking-tight text-neutral-250 md:text-5xl lg:text-6xl dark:text-black pt-3">
                 Let's Play Palace
             </h1>
             <div className="flex justify-center items-center">

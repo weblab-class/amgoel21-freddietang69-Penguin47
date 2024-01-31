@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import { get, post } from "../../utilities";
 
+import { socket } from "../../client-socket.js";
+
 const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [value, setValue] = useState("");
@@ -10,6 +12,18 @@ const Chat = () => {
         get("/api/messages").then((data) => {
             setMessages(data);
         });
+    }, []);
+
+    useEffect(() => {
+        const callback = (useless) => {
+            get("/api/messages").then((data) => {
+                setMessages(data);
+            });
+        };
+        socket.on("message", callback);
+        return () => {
+            socket.off("message", callback);
+        };
     }, []);
 
     const submitMessage = () => {
