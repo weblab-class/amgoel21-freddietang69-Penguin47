@@ -22,8 +22,14 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
     return (
         <div className="NavBar-container text-white">
             <div className="absolute left-0 top-0 h-full w-1/5">
-                <a href="/">
+                {/* <a href="/">
                     <img src={logo} alt="Palace" width={100}></img>
+                </a> */}
+                <a
+                    href="/"
+                    className="text-xl text-extrabold flex items-center justify-center h-full"
+                >
+                    Palace
                 </a>
             </div>
             <div className="absolute left-[20%] top-0 h-full w-3/5 flex justify-center items-center gap-8">
@@ -47,16 +53,16 @@ const NavBar = ({ userId, handleLogin, handleLogout }) => {
                 <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                     {userId ? (
                         <>
+                            <div className="text-xl">{userName}</div>
                             <button
                                 onClick={() => {
                                     googleLogout();
                                     handleLogout();
                                 }}
-                                className="text-xl"
+                                className="text-xl bg-yellow-500 p-2 rounded-full"
                             >
                                 Logout
                             </button>
-                            <div className="text-xl">{userName}</div>
                         </>
                     ) : (
                         <GoogleLogin
