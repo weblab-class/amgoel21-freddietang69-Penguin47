@@ -70,7 +70,7 @@ router.get("/lobbies", (req, res) => {
     );
 });
 
-router.post("/makelobby", (req, res) => {
+router.post("/makelobby", auth.ensureLoggedIn, (req, res) => {
     const id = Object.keys(gameLogic.idToGameMap).length.toString();
     gameLogic.makeGame(req.body.name, id, req.user);
     socketManager.getIo().emit("lobby", "made a lobby");
