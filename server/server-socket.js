@@ -39,7 +39,10 @@ const sendGameState = (gameId) => {
         to_send.player_pos = i;
         i++;
         // console.log(player._id, to_send);
-        getSocketFromUserID(player._id).emit("update", to_send);
+        user = getSocketFromUserID(player._id);
+        if (user) {
+            user.emit("update", to_send);
+        }
     }
     // io.emit("update", gameLogic.nameToGameMap[gameId]);
 };
