@@ -167,20 +167,39 @@ router.get("/user", (req, res) => {
 });
 
 router.get("/messages", (req, res) => {
-    Message.find().then((data) => {
-        res.send(data);
-    });
+    // Message.find().then((data) => {
+    //     res.send(data);
+    // });
+    console.log("trying to get messages from game: ", req.query.gameId);
+    // console.log(gameLogic.idToGameMap[req.body.gameId]);
+    if (req.query.gameId in gameLogic.idToGameMap) {
+        res.send(gameLogic.idToGameMap[req.query.gameId].messages);
+    } else {
+        console.log("error, cannot get messages from unknown gameId: ", req.query.gameId);
+    }
 });
 
 router.post("/message", auth.ensureLoggedIn, (req, res) => {
+    // if (req.user) {
+    //     const message = new Message({
+    //         creator: req.user.name,
+    //         content: req.body.content,
+    //     });
+    //     message.save().then((data) => {
+    //         socketManager.getIo().emit("message", {});
+    //     });
+    // }
     if (req.user) {
-        const message = new Message({
-            creator: req.user.name,
-            content: req.body.content,
-        });
-        message.save().then((data) => {
+        if (req.body.gameId in gameLogic.idToGameMap) {
+            const message = {
+                creator: req.user.name,
+                content: req.body.content,
+            };
+            gameLogic.idToGameMap[req.body.gameId].messages.push(message);
             socketManager.getIo().emit("message", {});
-        });
+        } else {
+            console.log("error, cannot post messages to unknown gameId: ", req.body.gameId);
+        }
     }
 });
 

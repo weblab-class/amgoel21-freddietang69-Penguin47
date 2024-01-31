@@ -28,6 +28,7 @@ const makeGame = (name, gameId, creator = { name: "default", _id: "default" }) =
         idx: 0, //for removal in declined block
         winner: -1,
         twoSevenEightTen: [4, 4, 4, 4],
+        messages: [],
     };
     console.log("hello", creator);
     idToGameMap[gameId] = game;

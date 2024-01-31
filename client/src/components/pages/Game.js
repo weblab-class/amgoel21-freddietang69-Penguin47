@@ -8,6 +8,7 @@ import "./Game.css";
 
 import CardContainer from "../modules/CardContainer.js";
 import { useParams } from "react-router-dom";
+import Chat from "../modules/Chat.js";
 
 const GameWaiting = ({ gameId, readySelect, isCreator, players }) => {
     const [sliderValues, setSliderValues] = useState([4, 4, 4, 4]);
@@ -93,15 +94,10 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
         <>
             {!locked.current ? (
                 <>
-                    <div className="text-white flex justify-center">
-                        <button onClick={readyUpPlay} className="steal-button">
-                            Submit 3 Selected Top Cards
-                        </button>
-                    </div>
                     <div className="grid grid-cols-3 gap-4">
                         {playerDeck.map((card, index) => {
                             return (
-                                <div class="grid place-items-center">
+                                <div className="grid place-items-center">
                                     <CardContainer
                                         card={card}
                                         width={150}
@@ -119,6 +115,11 @@ const GameSelecting = ({ gameId, gameState, players, playerDeck }) => {
                                 </div>
                             );
                         })}
+                    </div>
+                    <div className="text-white flex justify-center">
+                        <button onClick={readyUpPlay} className="steal-button">
+                            Submit 3 Selected Top Cards
+                        </button>
                     </div>
                 </>
             ) : (
@@ -215,13 +216,13 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
                     </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 my-16">
+                <div className="grid grid-cols-7 gap-3 my-16 mx-4">
                     {playerDeck.map((card, index) => {
                         return (
-                            <div key={index} class="grid place-items-center">
+                            <div key={index} className="grid place-items-center">
                                 <CardContainer
                                     card={card}
-                                    width={150}
+                                    width={100}
                                     highlighted={selected.has(index)}
                                     onClick={() => {
                                         addToSelected(index);
@@ -239,6 +240,11 @@ const GamePlayScreen = ({ userId, gameId, gameState, players, playerDeck, pile, 
                             return <CardContainer card={card} width={100} />;
                         })}
                     </div>
+                </div>
+
+                <div className="mt-16 grid grid-cols-2 gap-4">
+                    <div></div>
+                    <Chat gameId={gameId} />
                 </div>
             </div>
         </div>
@@ -315,7 +321,7 @@ const Game = ({ userId }) => {
     return (
         <>
             {!userId ? (
-                <div class="text-white">Please Log In</div>
+                <div className="text-white">Please Log In</div>
             ) : gameState === "waiting" ? (
                 <GameWaiting
                     gameId={gameId}

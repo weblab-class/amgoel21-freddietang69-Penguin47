@@ -5,6 +5,7 @@ import logo from "../../palace.jpg";
 import NavBar from "../modules/NavBar.js";
 
 const Home = ({ userId, handleLogin, handleLogout }) => {
+    document.body.style = "background: rgb(242, 242, 242);";
     return (
         <div>
             <NavBar handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
